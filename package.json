@@ -72,9 +72,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/mic-browser-ultimate.git"
+    "url": "https://github.com/JLamance79/mic-browser-ultimate.git"
   },
-  "homepage": "https://github.com/yourusername/mic-browser-ultimate",
+  "homepage": "https://github.com/JLamance79/mic-browser-ultimate",
   "build": {
     "appId": "com.micbrowser.ultimate",
     "productName": "MIC Browser Ultimate",
@@ -87,7 +87,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "yourusername",
+        "owner": "JLamance79",
         "repo": "mic-browser-ultimate",
         "releaseType": "release"
       },
