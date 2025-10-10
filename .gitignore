@@ -1,0 +1,142 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+out/
+
+# Electron
+*.tgz
+*.tar.gz
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output/
+
+# Compiled binary addons
+build/Release/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+*.pid
+*.seed
+*.pid.lock
+
+# Optional cache directories
+.cache/
+.tmp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+
+# Application specific
+releases/
+*.asar
+*.app
+*.exe
+*.dmg
+*.deb
+*.rpm
+*.AppImage
+
+# User data and config
+user-data/
+app-data/
+storage/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Certificate files
+*.pem
+*.key
+*.cert
+*.crt
+
+# API keys and secrets
+*secret*
+*key*
+*token*
+*password*
+config/secrets/
+
+# Auto-updater files
+update-cache/
+
+# Test files
+test-results/
+coverage/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Platform specific build artifacts
+*.exe.blockmap
+*.dmg.blockmap
+
+# Electron builder cache
+.electron-builder-cache/
+
+# Native modules
+*.node
+
+# Electron cache
+electron-cache/
+
+# uploads
+uploads/

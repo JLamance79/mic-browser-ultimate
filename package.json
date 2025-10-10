@@ -1,0 +1,233 @@
+{
+  "name": "mic-browser-ultimate",
+  "version": "1.0.0",
+  "description": "MIC Browser Ultimate - Advanced Cross-Platform Browser with AI-Powered Analysis",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "lint": "eslint . --ext .js",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "test": "echo \"Tests not implemented yet\" && exit 0",
+    "prepare-icons": "node scripts/ensure-icons.js",
+    "create-icons": "node scripts/create-icon.js && node scripts/create-ico.js",
+    "build": "npm run prepare-icons && electron-builder",
+    "build:ci": "npm run prepare-icons && electron-builder --publish=never",
+    "build:release": "npm run prepare-icons && electron-builder --publish=always",
+    "build:win": "npm run prepare-icons && electron-builder --win",
+    "build:mac": "npm run prepare-icons && electron-builder --mac",
+    "build:linux": "npm run prepare-icons && electron-builder --linux",
+    "build:all": "npm run prepare-icons && electron-builder --win --mac --linux",
+    "dist": "electron-builder --publish=never",
+    "publish": "electron-builder --publish=always",
+    "publish:github": "electron-builder --publish=always --config.publish.provider=github",
+    "publish:generic": "electron-builder --publish=always --config.publish.provider=generic",
+    "release": "node build-release.js",
+    "release:win": "node build-release.js --platform=win",
+    "release:mac": "node build-release.js --platform=mac",
+    "release:linux": "node build-release.js --platform=linux",
+    "release:publish": "node build-release.js --publish",
+    "update-server": "node update-server.js",
+    "test-updates": "node test-updates.js",
+    "clean": "rimraf dist node_modules/.cache",
+    "reinstall": "rimraf node_modules package-lock.json && npm install",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": [
+    "browser",
+    "ai",
+    "assistant",
+    "automation",
+    "llm"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^38.2.1",
+    "electron-builder": "^24.13.3",
+    "electron-reload": "^2.0.0-alpha.1",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "node-fetch": "^3.3.2",
+    "png-to-ico": "^2.0.0",
+    "prettier": "^2.8.8",
+    "rimraf": "^3.0.2"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.65.0",
+    "@supabase/supabase-js": "^2.74.0",
+    "dotenv": "^17.2.3",
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.6.2",
+    "express": "^5.1.0",
+    "level": "^10.0.0",
+    "multer": "^2.0.2",
+    "openai": "^6.3.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.34.4",
+    "socket.io": "^4.8.1",
+    "tesseract.js": "^6.0.1",
+    "to-ico": "^1.1.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/mic-browser-ultimate.git"
+  },
+  "homepage": "https://github.com/yourusername/mic-browser-ultimate",
+  "build": {
+    "appId": "com.micbrowser.ultimate",
+    "productName": "MIC Browser Ultimate",
+    "copyright": "Copyright © 2025 MIC Browser Ultimate",
+    "compression": "maximum",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "yourusername",
+        "repo": "mic-browser-ultimate",
+        "releaseType": "release"
+      },
+      {
+        "provider": "generic",
+        "url": "https://your-update-server.com/releases/"
+      }
+    ],
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "*.js",
+      "assets/**",
+      "package.json",
+      "node_modules/**",
+      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!node_modules/*.d.ts",
+      "!node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "asarUnpack": [
+      "**/node_modules/sharp/**",
+      "**/node_modules/tesseract.js/**",
+      "eng.traineddata"
+    ],
+    "extraResources": [
+      {
+        "from": "eng.traineddata",
+        "to": "eng.traineddata"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "sign": false,
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "publisherName": "MIC Browser Ultimate",
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MIC Browser Ultimate"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Network",
+      "synopsis": "Advanced Cross-Platform Browser",
+      "description": "MIC Browser Ultimate - Advanced Cross-Platform Browser with AI-Powered Analysis"
+    },
+    "deb": {
+      "depends": [
+        "gconf2",
+        "gconf-service",
+        "libnotify4",
+        "libappindicator1",
+        "libxtst6",
+        "libnss3"
+      ]
+    },
+    "rpm": {
+      "depends": [
+        "libnotify",
+        "libappindicator",
+        "libXtst",
+        "nss"
+      ]
+    }
+  }
+}

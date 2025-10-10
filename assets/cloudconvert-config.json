@@ -1,0 +1,59 @@
+{
+  "name": "CloudConvert Icon Conversion",
+  "description": "CloudConvert API configuration for batch icon processing",
+  "version": "1.0.0",
+  "apiEndpoint": "https://api.cloudconvert.com/v2",
+  "supportedFormats": {
+    "input": ["png", "jpg", "jpeg", "svg", "webp", "bmp", "tiff", "gif"],
+    "output": ["ico", "png", "jpg", "svg", "webp", "icns"]
+  },
+  "iconSizes": {
+    "windows": [16, 32, 48, 64, 128, 256],
+    "mac": [16, 32, 64, 128, 256, 512, 1024],
+    "web": [16, 32, 48, 64, 96, 128, 192, 512],
+    "android": [36, 48, 72, 96, 144, 192, 512]
+  },
+  "conversionTemplates": {
+    "windowsIcon": {
+      "format": "ico",
+      "sizes": [16, 32, 48, 256],
+      "quality": 95,
+      "compression": "lossless"
+    },
+    "macIcon": {
+      "format": "icns", 
+      "sizes": [16, 32, 64, 128, 256, 512],
+      "quality": 95
+    },
+    "favicon": {
+      "format": "ico",
+      "sizes": [16, 32, 48],
+      "quality": 90
+    },
+    "webIcon": {
+      "format": "png",
+      "sizes": [192, 512],
+      "quality": 95,
+      "transparent": true
+    }
+  },
+  "apiConfig": {
+    "baseUrl": "https://api.cloudconvert.com/v2",
+    "timeout": 30000,
+    "retries": 3,
+    "rateLimiting": {
+      "requestsPerMinute": 60,
+      "requestsPerHour": 3600
+    }
+  },
+  "usage": {
+    "apiKey": "Set CLOUDCONVERT_API_KEY in .env file",
+    "documentation": "https://cloudconvert.com/api/v2",
+    "examples": [
+      "Convert SVG to ICO with multiple sizes",
+      "Batch process icons for all platforms",
+      "Generate favicon packages",
+      "Create app store ready icons"
+    ]
+  }
+}
