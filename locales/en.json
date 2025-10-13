@@ -1,0 +1,359 @@
+{
+  "app": {
+    "title": "MIC Browser Ultimate - The Future of Web Automation",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "open": "Open",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "refresh": "Refresh",
+    "search": "Search",
+    "settings": "Settings",
+    "help": "Help",
+    "about": "About"
+  },
+  "menu": {
+    "file": "File",
+    "edit": "Edit",
+    "view": "View",
+    "window": "Window",
+    "help": "Help",
+    "newTab": "New Tab",
+    "closeTab": "Close Tab",
+    "openFile": "Open File",
+    "saveAs": "Save As",
+    "print": "Print",
+    "quit": "Quit",
+    "undo": "Undo",
+    "redo": "Redo",
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste",
+    "selectAll": "Select All",
+    "find": "Find",
+    "findNext": "Find Next",
+    "reload": "Reload",
+    "forceReload": "Force Reload",
+    "toggleDevTools": "Toggle Developer Tools",
+    "actualSize": "Actual Size",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "toggleFullscreen": "Toggle Fullscreen",
+    "minimize": "Minimize",
+    "close": "Close",
+    "documentation": "Documentation",
+    "reportIssue": "Report Issue",
+    "aboutApp": "About MIC Browser Ultimate"
+  },
+  "tabs": {
+    "newTab": "New Tab",
+    "closeTab": "Close Tab",
+    "pinTab": "Pin Tab",
+    "unpinTab": "Unpin Tab",
+    "muteTab": "Mute Tab",
+    "unmuteTab": "Unmute Tab",
+    "duplicateTab": "Duplicate Tab",
+    "closeOtherTabs": "Close Other Tabs",
+    "closeTabsToRight": "Close Tabs to the Right",
+    "reloadTab": "Reload Tab"
+  },
+  "navigation": {
+    "back": "Back",
+    "forward": "Forward",
+    "reload": "Reload",
+    "home": "Home",
+    "addressBar": "Enter URL or search term",
+    "goToUrl": "Go to URL",
+    "bookmarks": "Bookmarks",
+    "history": "History",
+    "downloads": "Downloads"
+  },
+  "chat": {
+    "title": "MIC Assistant",
+    "placeholder": "Ask MIC Assistant anything...",
+    "send": "Send",
+    "clear": "Clear Chat",
+    "thinking": "Thinking...",
+    "error": "Sorry, I encountered an error. Please try again.",
+    "noApiKey": "Please configure your API key in settings to use the assistant.",
+    "welcome": "Hello! I'm MIC Assistant. How can I help you today?",
+    "suggestions": {
+      "automateTask": "Help me automate a task",
+      "extractData": "Extract data from this page",
+      "analyzeContent": "Analyze the current content",
+      "navigateWebsite": "Help me navigate this website"
+    }
+  },
+  "ocr": {
+    "title": "Document Scanner",
+    "uploadArea": "Drop files here or click to select",
+    "supportedFormats": "Supported formats: JPG, PNG, PDF, TIFF, BMP, WEBP",
+    "processing": "Processing document...",
+    "extractedText": "Extracted Text",
+    "confidence": "Confidence",
+    "wordCount": "Words",
+    "lineCount": "Lines",
+    "language": "Language",
+    "mode": "Scan Mode",
+    "options": {
+      "basic": "Basic",
+      "advanced": "Advanced",
+      "preprocessing": "Preprocessing"
+    },
+    "languages": {
+      "eng": "English",
+      "spa": "Spanish",
+      "fra": "French",
+      "deu": "German",
+      "ita": "Italian",
+      "por": "Portuguese",
+      "rus": "Russian",
+      "chi_sim": "Chinese (Simplified)",
+      "chi_tra": "Chinese (Traditional)",
+      "jpn": "Japanese",
+      "kor": "Korean",
+      "ara": "Arabic",
+      "hin": "Hindi"
+    },
+    "modes": {
+      "auto": "Auto Detection (Recommended)",
+      "singleBlock": "Single Uniform Block",
+      "singleLine": "Single Text Line",
+      "singleWord": "Single Word",
+      "singleChar": "Single Character",
+      "rawLine": "Raw Line (No Layout)"
+    },
+    "export": {
+      "title": "Export Results",
+      "txt": "Export as TXT",
+      "json": "Export as JSON",
+      "html": "Export as HTML"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "categories": {
+      "general": "General",
+      "appearance": "Appearance",
+      "privacy": "Privacy & Security",
+      "performance": "Performance",
+      "automation": "Automation",
+      "language": "Language & Region",
+      "advanced": "Advanced"
+    },
+    "general": {
+      "startupBehavior": "Startup Behavior",
+      "defaultSearchEngine": "Default Search Engine",
+      "homePage": "Home Page",
+      "newTabPage": "New Tab Page",
+      "downloads": "Downloads Location",
+      "notifications": "Notifications"
+    },
+    "appearance": {
+      "theme": "Theme",
+      "themes": {
+        "dark": "Dark",
+        "light": "Light",
+        "auto": "Auto (System)"
+      },
+      "fontSize": "Font Size",
+      "fontSizes": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large"
+      },
+      "sidebarPosition": "Sidebar Position",
+      "positions": {
+        "left": "Left",
+        "right": "Right"
+      },
+      "compactMode": "Compact Mode",
+      "animations": "Animations",
+      "transparency": "Window Transparency"
+    },
+    "language": {
+      "interfaceLanguage": "Interface Language",
+      "dateFormat": "Date Format",
+      "timeFormat": "Time Format",
+      "numberFormat": "Number Format",
+      "region": "Region"
+    },
+    "privacy": {
+      "encryption": "Data Encryption",
+      "auditLogging": "Audit Logging",
+      "biometricAuth": "Biometric Authentication",
+      "cookiePolicy": "Cookie Policy",
+      "policies": {
+        "allow": "Allow All",
+        "strict": "Strict",
+        "block": "Block All"
+      },
+      "trackingProtection": "Tracking Protection",
+      "autoUpdates": "Automatic Updates"
+    },
+    "performance": {
+      "memoryUsage": "Memory Usage",
+      "usage": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High"
+      },
+      "backgroundTabs": "Background Tabs",
+      "tabBehavior": {
+        "active": "Keep Active",
+        "suspend": "Suspend",
+        "unload": "Unload"
+      },
+      "preloadPages": "Preload Pages",
+      "hardwareAcceleration": "Hardware Acceleration"
+    },
+    "automation": {
+      "autoRecording": "Auto Recording",
+      "smartSuggestions": "Smart Suggestions",
+      "executeOnConfidence": "Execute on Confidence",
+      "backupWorkflows": "Backup Workflows"
+    },
+    "voice": {
+      "language": "Voice Language",
+      "sensitivity": "Sensitivity",
+      "levels": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "wakeWord": "Wake Word",
+      "continuous": "Continuous Listening",
+      "feedback": "Voice Feedback"
+    }
+  },
+  "plugins": {
+    "title": "Plugin Manager",
+    "installed": "Installed Plugins",
+    "available": "Available Plugins",
+    "developer": "Developer Tools",
+    "enable": "Enable",
+    "disable": "Disable",
+    "install": "Install",
+    "uninstall": "Uninstall",
+    "configure": "Configure",
+    "update": "Update",
+    "createNew": "Create New Plugin",
+    "noPlugins": "No plugins installed",
+    "loading": "Loading plugins...",
+    "error": "Error loading plugin"
+  },
+  "security": {
+    "title": "Security Manager",
+    "status": "Security Status",
+    "threats": "Threats Detected",
+    "blocked": "Threats Blocked",
+    "auditLog": "Audit Log",
+    "clearLog": "Clear Log",
+    "exportLog": "Export Log",
+    "secureConnection": "Secure Connection",
+    "encryption": "Encryption Active",
+    "authentication": "Authentication Required"
+  },
+  "learning": {
+    "title": "Learning System",
+    "training": "Training in Progress",
+    "suggestions": "AI Suggestions",
+    "patterns": "Learned Patterns",
+    "accuracy": "Accuracy",
+    "confidence": "Confidence Level",
+    "adaptiveUI": "Adaptive Interface",
+    "personalizedFeatures": "Personalized Features"
+  },
+  "crossTab": {
+    "title": "Cross-Tab Transfer",
+    "activeTransfers": "Active Transfers",
+    "history": "Transfer History",
+    "newTransfer": "New Transfer",
+    "selectSource": "Select Source Tab",
+    "selectTarget": "Select Target Tab",
+    "transferData": "Transfer Data",
+    "noTransfers": "No active transfers",
+    "transferComplete": "Transfer completed successfully"
+  },
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "overview": "Overview",
+    "usage": "Usage Statistics",
+    "performance": "Performance Metrics",
+    "trends": "Trends & Insights",
+    "sessions": "Sessions",
+    "pageViews": "Page Views",
+    "averageTime": "Average Time",
+    "mostVisited": "Most Visited Sites"
+  },
+  "voice": {
+    "title": "Voice Assistant",
+    "listening": "Listening...",
+    "processing": "Processing...",
+    "speakNow": "Speak now",
+    "microphoneAccess": "Microphone access required",
+    "voiceCommand": "Voice Command",
+    "speechRecognition": "Speech Recognition",
+    "textToSpeech": "Text to Speech"
+  },
+  "notifications": {
+    "newUpdate": "New update available",
+    "updateReady": "Update ready to install",
+    "downloadComplete": "Download completed",
+    "pluginInstalled": "Plugin installed successfully",
+    "securityAlert": "Security alert",
+    "taskCompleted": "Task completed",
+    "errorOccurred": "An error occurred",
+    "connectionLost": "Connection lost",
+    "connectionRestored": "Connection restored"
+  },
+  "updates": {
+    "title": "Updates",
+    "checking": "Checking for updates...",
+    "available": "Update available",
+    "downloading": "Downloading update...",
+    "ready": "Update ready to install",
+    "upToDate": "You're up to date",
+    "install": "Install Update",
+    "later": "Install Later",
+    "changelog": "What's New"
+  },
+  "errors": {
+    "pageLoadError": "Failed to load page",
+    "networkError": "Network connection error",
+    "timeoutError": "Request timed out",
+    "unauthorized": "Unauthorized access",
+    "notFound": "Page not found",
+    "serverError": "Server error",
+    "unknownError": "Unknown error occurred",
+    "tryAgain": "Try again",
+    "goBack": "Go back",
+    "reportProblem": "Report problem"
+  },
+  "shortcuts": {
+    "newTab": "Ctrl+T",
+    "closeTab": "Ctrl+W",
+    "reopenTab": "Ctrl+Shift+T",
+    "nextTab": "Ctrl+Tab",
+    "prevTab": "Ctrl+Shift+Tab",
+    "reload": "Ctrl+R",
+    "forceReload": "Ctrl+Shift+R",
+    "devTools": "F12",
+    "find": "Ctrl+F",
+    "addressBar": "Ctrl+L",
+    "bookmarks": "Ctrl+B",
+    "history": "Ctrl+H",
+    "downloads": "Ctrl+J",
+    "settings": "Ctrl+,",
+    "fullscreen": "F11"
+  }
+}

@@ -102,6 +102,47 @@ class PageAnalyzer {
     }
 
     /**
+     * Analyze extracted page content from webview
+     */
+    async analyzeExtractedContent(pageContent) {
+        try {
+            const analysis = {
+                url: pageContent.url,
+                title: pageContent.title,
+                timestamp: new Date().toISOString(),
+                categories: {}
+            };
+
+            // Analyze content using extracted data
+            analysis.categories.content = this.analyzeExtractedContentStructure(pageContent);
+            analysis.categories.seo = this.analyzeExtractedSEO(pageContent);
+            analysis.categories.accessibility = this.analyzeExtractedAccessibility(pageContent);
+            analysis.categories.performance = this.analyzeExtractedPerformance(pageContent);
+            analysis.categories.security = this.analyzeExtractedSecurity(pageContent);
+
+            // Generate overall score and recommendations
+            analysis.overallScore = this.calculateOverallScore(analysis.categories);
+            analysis.recommendations = this.generateRecommendations(analysis.categories);
+            analysis.insights = this.generateInsights(analysis.categories);
+
+            // Cache the analysis
+            this.analysisCache.set(analysis.url, analysis);
+            this.currentAnalysis = analysis;
+
+            return analysis;
+        } catch (error) {
+            console.error('Extracted content analysis failed:', error);
+            return {
+                success: false,
+                error: error.message,
+                url: pageContent.url || 'unknown',
+                timestamp: new Date().toISOString(),
+                overallScore: 0
+            };
+        }
+    }
+
+    /**
      * Analyze page content structure and quality
      */
     async analyzeContent() {
@@ -1259,6 +1300,219 @@ class PageAnalyzer {
         
         // Could add other formats like CSV, HTML report, etc.
         return this.currentAnalysis;
+    }
+
+    /**
+     * Analyze extracted content structure
+     */
+    analyzeExtractedContentStructure(pageContent) {
+        const content = {
+            score: 0,
+            metrics: {},
+            issues: [],
+            recommendations: []
+        };
+
+        try {
+            // Text analysis
+            const wordCount = pageContent.text ? pageContent.text.trim().split(/\s+/).length : 0;
+            const characterCount = pageContent.text ? pageContent.text.length : 0;
+            
+            content.metrics.wordCount = wordCount;
+            content.metrics.characterCount = characterCount;
+
+            // Heading analysis
+            const headingCounts = {};
+            pageContent.headings.forEach(h => {
+                headingCounts[h.tag] = (headingCounts[h.tag] || 0) + 1;
+            });
+            content.metrics.headings = headingCounts;
+
+            // Image analysis
+            const totalImages = pageContent.images.length;
+            const imagesWithAlt = pageContent.images.filter(img => img.alt).length;
+            content.metrics.images = {
+                total: totalImages,
+                withAlt: imagesWithAlt,
+                altCoverage: totalImages > 0 ? Math.round((imagesWithAlt / totalImages) * 100) : 100
+            };
+
+            // Scoring
+            let score = 0;
+            if (wordCount >= 300) score += 20;
+            else if (wordCount >= 150) score += 10;
+
+            if (headingCounts.h1 === 1) score += 15;
+            if (headingCounts.h2 > 0) score += 10;
+            if (content.metrics.images.altCoverage >= 90) score += 15;
+
+            content.score = Math.min(score, 100);
+
+            // Recommendations
+            if (wordCount < 300) {
+                content.recommendations.push('Consider adding more content (aim for 300+ words)');
+            }
+            if (headingCounts.h1 !== 1) {
+                content.recommendations.push('Page should have exactly one H1 heading');
+            }
+            if (content.metrics.images.altCoverage < 90) {
+                content.recommendations.push('Add alt text to all images for better accessibility');
+            }
+
+        } catch (error) {
+            console.error('Content structure analysis failed:', error);
+        }
+
+        return content;
+    }
+
+    /**
+     * Analyze extracted SEO data
+     */
+    analyzeExtractedSEO(pageContent) {
+        const seo = {
+            score: 0,
+            metrics: {},
+            issues: [],
+            recommendations: []
+        };
+
+        try {
+            // Title analysis
+            const titleLength = pageContent.title ? pageContent.title.length : 0;
+            seo.metrics.title = {
+                length: titleLength,
+                optimal: titleLength >= 30 && titleLength <= 60
+            };
+
+            // Meta description analysis
+            const metaDesc = pageContent.meta.find(m => m.name === 'description');
+            const descLength = metaDesc ? metaDesc.content.length : 0;
+            seo.metrics.metaDescription = {
+                length: descLength,
+                optimal: descLength >= 120 && descLength <= 160,
+                present: !!metaDesc
+            };
+
+            // Scoring
+            let score = 0;
+            if (seo.metrics.title.optimal) score += 25;
+            else if (titleLength > 0) score += 10;
+
+            if (seo.metrics.metaDescription.optimal) score += 25;
+            else if (seo.metrics.metaDescription.present) score += 10;
+
+            if (pageContent.headings.length > 0) score += 20;
+            if (pageContent.images.filter(img => img.alt).length > 0) score += 15;
+            if (pageContent.links.length > 0) score += 15;
+
+            seo.score = Math.min(score, 100);
+
+            // Recommendations
+            if (!seo.metrics.title.optimal) {
+                seo.recommendations.push('Optimize title length (30-60 characters)');
+            }
+            if (!seo.metrics.metaDescription.optimal) {
+                seo.recommendations.push('Add meta description (120-160 characters)');
+            }
+
+        } catch (error) {
+            console.error('SEO analysis failed:', error);
+        }
+
+        return seo;
+    }
+
+    /**
+     * Analyze extracted accessibility data
+     */
+    analyzeExtractedAccessibility(pageContent) {
+        const accessibility = {
+            score: 0,
+            metrics: {},
+            issues: [],
+            recommendations: []
+        };
+
+        try {
+            // Image alt text coverage
+            const imagesWithAlt = pageContent.images.filter(img => img.alt).length;
+            const altCoverage = pageContent.images.length > 0 ? (imagesWithAlt / pageContent.images.length) * 100 : 100;
+
+            // Heading structure
+            const hasH1 = pageContent.headings.some(h => h.tag === 'h1');
+            const headingStructure = pageContent.headings.length > 0;
+
+            accessibility.metrics = {
+                altTextCoverage: Math.round(altCoverage),
+                hasH1: hasH1,
+                headingStructure: headingStructure
+            };
+
+            // Scoring
+            let score = 0;
+            if (altCoverage >= 90) score += 40;
+            else if (altCoverage >= 70) score += 20;
+
+            if (hasH1) score += 30;
+            if (headingStructure) score += 30;
+
+            accessibility.score = Math.min(score, 100);
+
+            // Recommendations
+            if (altCoverage < 90) {
+                accessibility.recommendations.push('Add alt text to all images');
+            }
+            if (!hasH1) {
+                accessibility.recommendations.push('Add an H1 heading to the page');
+            }
+
+        } catch (error) {
+            console.error('Accessibility analysis failed:', error);
+        }
+
+        return accessibility;
+    }
+
+    /**
+     * Analyze extracted performance data
+     */
+    analyzeExtractedPerformance(pageContent) {
+        const performance = {
+            score: 75, // Default score since we can't measure from extracted content
+            metrics: {
+                imageCount: pageContent.images.length,
+                linkCount: pageContent.links.length,
+                contentSize: pageContent.html ? pageContent.html.length : 0
+            },
+            issues: [],
+            recommendations: []
+        };
+
+        // Basic performance recommendations
+        if (pageContent.images.length > 20) {
+            performance.recommendations.push('Consider optimizing or lazy-loading images');
+            performance.score -= 10;
+        }
+
+        return performance;
+    }
+
+    /**
+     * Analyze extracted security data
+     */
+    analyzeExtractedSecurity(pageContent) {
+        const security = {
+            score: 80, // Default score
+            metrics: {
+                httpsLinks: pageContent.links.filter(link => link.href.startsWith('https:')).length,
+                externalLinks: pageContent.links.filter(link => !link.href.includes(pageContent.url)).length
+            },
+            issues: [],
+            recommendations: []
+        };
+
+        return security;
     }
 }
 

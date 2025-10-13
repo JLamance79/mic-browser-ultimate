@@ -15,6 +15,7 @@ const { AdaptiveUISystem } = require('./AdaptiveUI');
 const { getSecurityManager } = require('./SecurityManager');
 const PluginManager = require('./PluginManager');
 const PluginDeveloper = require('./PluginDeveloper');
+const { i18n } = require('./I18nManager');
 
 // Analytics & Telemetry Configuration
 // Replace 'UA-XXXXXXXX-X' with your actual Google Analytics tracking ID
@@ -407,6 +408,10 @@ app.whenReady().then(async () => {
     securityManager = getSecurityManager();
     await securityManager.initialize();
     
+    // Initialize i18n system
+    await i18n.initialize();
+    console.log('🌐 I18n system initialized');
+    
     // Setup security policies for the session
     await setupSecurityPolicies();
     
@@ -732,7 +737,7 @@ async function handleAIRequest(request) {
         });
         
         const response = await openai.chat.completions.create({
-          model: "gpt-4",
+          model: "gpt-4o-mini",
           messages: [
             {
               role: "system",
@@ -766,7 +771,7 @@ async function handleAIRequest(request) {
         });
         
         const response = await anthropic.messages.create({
-          model: "claude-3-sonnet-20240229",
+          model: "claude-3-5-haiku-20241022",
           max_tokens: request.maxTokens || 1000,
           temperature: request.temperature || 0.7,
           messages: [
@@ -1678,6 +1683,62 @@ ipcMain.handle('storage-get-all-settings', async (event) => {
     } catch (error) {
         console.error('Storage get all settings error:', error);
         return {};
+    }
+});
+
+// I18n (Internationalization) handlers
+ipcMain.handle('i18n-get-translations', async (event, langCode) => {
+    try {
+        const translations = i18n.exportTranslations(langCode);
+        return { success: true, translations };
+    } catch (error) {
+        console.error('I18n get translations error:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+ipcMain.handle('i18n-set-language', async (event, langCode) => {
+    try {
+        const success = await i18n.setLanguage(langCode);
+        if (success) {
+            // Save language preference
+            await storage.setSetting('app.language', langCode);
+        }
+        return { success };
+    } catch (error) {
+        console.error('I18n set language error:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+ipcMain.handle('i18n-get-available-languages', async (event) => {
+    try {
+        const languages = i18n.getAvailableLanguages();
+        return { success: true, languages };
+    } catch (error) {
+        console.error('I18n get available languages error:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+ipcMain.handle('i18n-get-current-language', async (event) => {
+    try {
+        const currentLanguage = i18n.getCurrentLanguage();
+        const info = i18n.getLanguageInfo(currentLanguage);
+        return { success: true, language: currentLanguage, info };
+    } catch (error) {
+        console.error('I18n get current language error:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+ipcMain.handle('i18n-get-language-preference', async (event) => {
+    try {
+        const savedLanguage = await storage.getSetting('app.language', 'en');
+        return savedLanguage;
+    } catch (error) {
+        console.error('I18n get language preference error:', error);
+        return 'en';
     }
 });
 

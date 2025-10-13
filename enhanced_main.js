@@ -337,7 +337,7 @@ class MicBrowserCore {
     const context = await this.buildContext(request);
 
     const message = await this.anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 2048,
       temperature: 0.7,
       system: this.buildSystemPrompt(context),

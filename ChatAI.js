@@ -16,7 +16,7 @@ class ChatAI extends EventEmitter {
     
     // AI configuration
     this.config = {
-      model: 'claude-3-sonnet-20240229',
+      model: 'claude-3-5-haiku-20241022',
       maxTokens: 1500,
       temperature: 0.7,
       systemPrompt: this.buildSystemPrompt()

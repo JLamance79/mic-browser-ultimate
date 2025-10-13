@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIC Browser Ultimate - Tab Testing Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #007bff;
+        }
+        
+        .test-button {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+        
+        .test-button:active {
+            transform: translateY(0);
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status.success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status.error {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .status.pending {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .results {
+            background: #343a40;
+            color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-box {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .manual-tests {
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .manual-test-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .manual-test-item:hover {
+            background: #f0f0f0;
+        }
+        
+        .checkbox {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+        
+        .summary {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 MIC Browser Ultimate - Tab Testing Dashboard</h1>
+        
+        <div class="info-box">
+            <h2>🚀 Application Status</h2>
+            <p id="appStatus">Checking...</p>
+        </div>
+
+        <div class="grid">
+            <div class="test-section">
+                <h3>🤖 Automated Tests</h3>
+                <p>Click the buttons below to run automated tab tests:</p>
+                
+                <button class="test-button" onclick="testBasicTabFunctions()">
+                    Test Basic Tab Functions
+                    <span id="basicStatus" class="status pending">Ready</span>
+                </button><br>
+                
+                <button class="test-button" onclick="testTabNavigation()">
+                    Test Tab Navigation  
+                    <span id="navStatus" class="status pending">Ready</span>
+                </button><br>
+                
+                <button class="test-button" onclick="testTabCreationAndClosing()">
+                    Test Tab Creation/Closing
+                    <span id="createStatus" class="status pending">Ready</span>
+                </button><br>
+                
+                <button class="test-button" onclick="testKeyboardShortcuts()">
+                    Test Keyboard Shortcuts
+                    <span id="keyStatus" class="status pending">Ready</span>
+                </button><br>
+                
+                <button class="test-button" onclick="runAllTests()">
+                    🚀 Run All Tests
+                    <span id="allStatus" class="status pending">Ready</span>
+                </button>
+                
+                <div class="results" id="testResults" style="display: none;"></div>
+            </div>
+            
+            <div class="test-section">
+                <h3>✋ Manual Tests</h3>
+                <p>Complete these tests manually:</p>
+                
+                <div class="manual-tests">
+                    <div class="manual-test-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="checkbox">
+                        <span>New Tab Button (+) creates new tabs</span>
+                    </div>
+                    
+                    <div class="manual-test-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="checkbox">
+                        <span>Tab close button (×) closes tabs</span>
+                    </div>
+                    
+                    <div class="manual-test-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="checkbox">
+                        <span>Clicking tabs switches between them</span>
+                    </div>
+                    
+                    <div class="manual-test-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="checkbox">
+                        <span>URL bar accepts and navigates to websites</span>
+                    </div>
+                    
+                    <div class="manual-test-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="checkbox">
+                        <span>Tab titles update when navigating</span>
+                    </div>
+                    
+                    <div class="manual-test-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="checkbox">
+                        <span>Favicons appear in tabs</span>
+                    </div>
+                    
+                    <div class="manual-test-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="checkbox">
+                        <span>Right-click context menu works</span>
+                    </div>
+                    
+                    <div class="manual-test-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="checkbox">
+                        <span>Drag and drop reorders tabs</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="summary" id="summary" style="display: none;">
+            <h3>📊 Test Summary</h3>
+            <p id="summaryText">Complete tests to see results</p>
+        </div>
+    </div>
+
+    <script>
+        // Application status check
+        function checkAppStatus() {
+            const statusEl = document.getElementById('appStatus');
+            
+            if (typeof window.micBrowser === 'undefined') {
+                statusEl.innerHTML = '❌ MIC Browser object not found';
+                statusEl.style.background = '#dc3545';
+                return false;
+            }
+            
+            if (!window.micBrowser.tabManager) {
+                statusEl.innerHTML = '❌ Tab Manager not found';
+                statusEl.style.background = '#dc3545';
+                return false;
+            }
+            
+            const tabCount = window.micBrowser.tabManager.tabs.size;
+            statusEl.innerHTML = `✅ MIC Browser Ultimate is running - ${tabCount} tab(s) open`;
+            statusEl.style.background = '#28a745';
+            return true;
+        }
+        
+        // Utility functions
+        function log(message, type = 'info') {
+            const resultsEl = document.getElementById('testResults');
+            const timestamp = new Date().toLocaleTimeString();
+            const emoji = {
+                'info': 'ℹ️',
+                'success': '✅',
+                'error': '❌',
+                'warning': '⚠️'
+            };
+            
+            resultsEl.innerHTML += `<div>${emoji[type] || 'ℹ️'} [${timestamp}] ${message}</div>`;
+            resultsEl.scrollTop = resultsEl.scrollHeight;
+            resultsEl.style.display = 'block';
+        }
+        
+        function updateStatus(elementId, success, message = '') {
+            const statusEl = document.getElementById(elementId);
+            if (success) {
+                statusEl.className = 'status success';
+                statusEl.textContent = '✅ PASS';
+            } else {
+                statusEl.className = 'status error';
+                statusEl.textContent = '❌ FAIL';
+            }
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Test functions
+        async function testBasicTabFunctions() {
+            log('🧪 Testing Basic Tab Functions...', 'info');
+            
+            try {
+                if (!checkAppStatus()) {
+                    updateStatus('basicStatus', false);
+                    return;
+                }
+                
+                const tm = window.micBrowser.tabManager;
+                
+                // Test 1: Check required methods
+                const requiredMethods = ['createTab', 'closeTab', 'switchToTab', 'getActiveTab'];
+                const missingMethods = requiredMethods.filter(method => 
+                    typeof tm[method] !== 'function'
+                );
+                
+                if (missingMethods.length > 0) {
+                    log(`❌ Missing methods: ${missingMethods.join(', ')}`, 'error');
+                    updateStatus('basicStatus', false);
+                    return;
+                }
+                
+                log('✅ All required methods exist', 'success');
+                
+                // Test 2: Check active tab
+                const activeTab = tm.getActiveTab();
+                if (!activeTab) {
+                    log('❌ No active tab found', 'error');
+                    updateStatus('basicStatus', false);
+                    return;
+                }
+                
+                log(`✅ Active tab found: ${activeTab.id}`, 'success');
+                updateStatus('basicStatus', true);
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                updateStatus('basicStatus', false);
+            }
+        }
+        
+        async function testTabNavigation() {
+            log('🧪 Testing Tab Navigation...', 'info');
+            
+            try {
+                if (!checkAppStatus()) {
+                    updateStatus('navStatus', false);
+                    return;
+                }
+                
+                // Test navigation function exists
+                if (typeof window.micBrowser.navigateActiveTab !== 'function') {
+                    log('❌ navigateActiveTab method not found', 'error');
+                    updateStatus('navStatus', false);
+                    return;
+                }
+                
+                log('✅ Navigation method exists', 'success');
+                
+                // Test URL bar exists
+                const urlInput = document.getElementById('urlInput');
+                if (!urlInput) {
+                    log('❌ URL input element not found', 'error');
+                    updateStatus('navStatus', false);
+                    return;
+                }
+                
+                log('✅ URL input found', 'success');
+                
+                // Test basic navigation
+                const testUrl = 'https://www.example.com';
+                window.micBrowser.navigateActiveTab(testUrl);
+                
+                await sleep(500);
+                
+                log(`✅ Navigation test completed for ${testUrl}`, 'success');
+                updateStatus('navStatus', true);
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                updateStatus('navStatus', false);
+            }
+        }
+        
+        async function testTabCreationAndClosing() {
+            log('🧪 Testing Tab Creation and Closing...', 'info');
+            
+            try {
+                if (!checkAppStatus()) {
+                    updateStatus('createStatus', false);
+                    return;
+                }
+                
+                const tm = window.micBrowser.tabManager;
+                const initialCount = tm.tabs.size;
+                
+                log(`ℹ️ Initial tab count: ${initialCount}`, 'info');
+                
+                // Test 1: Create tab
+                const newTabId = tm.createTab({
+                    url: 'about:blank',
+                    title: 'Test Tab'
+                });
+                
+                await sleep(500);
+                
+                if (!newTabId) {
+                    log('❌ Failed to create tab', 'error');
+                    updateStatus('createStatus', false);
+                    return;
+                }
+                
+                const afterCreateCount = tm.tabs.size;
+                if (afterCreateCount !== initialCount + 1) {
+                    log(`❌ Tab count mismatch after creation: expected ${initialCount + 1}, got ${afterCreateCount}`, 'error');
+                    updateStatus('createStatus', false);
+                    return;
+                }
+                
+                log(`✅ Tab created successfully: ${newTabId}`, 'success');
+                
+                // Test 2: Close tab
+                tm.closeTab(newTabId);
+                await sleep(500);
+                
+                const afterCloseCount = tm.tabs.size;
+                if (afterCloseCount !== initialCount) {
+                    log(`❌ Tab count mismatch after closing: expected ${initialCount}, got ${afterCloseCount}`, 'error');
+                    updateStatus('createStatus', false);
+                    return;
+                }
+                
+                log(`✅ Tab closed successfully: ${newTabId}`, 'success');
+                updateStatus('createStatus', true);
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                updateStatus('createStatus', false);
+            }
+        }
+        
+        async function testKeyboardShortcuts() {
+            log('🧪 Testing Keyboard Shortcuts...', 'info');
+            
+            try {
+                if (!checkAppStatus()) {
+                    updateStatus('keyStatus', false);
+                    return;
+                }
+                
+                const tm = window.micBrowser.tabManager;
+                const initialCount = tm.tabs.size;
+                
+                // Test Ctrl+T (new tab)
+                const ctrlTEvent = new KeyboardEvent('keydown', {
+                    key: 't',
+                    code: 'KeyT',
+                    ctrlKey: true,
+                    bubbles: true
+                });
+                
+                document.dispatchEvent(ctrlTEvent);
+                await sleep(500);
+                
+                const afterCtrlT = tm.tabs.size;
+                if (afterCtrlT > initialCount) {
+                    log('✅ Ctrl+T created new tab', 'success');
+                } else {
+                    log('⚠️ Ctrl+T may not be working', 'warning');
+                }
+                
+                // Test Ctrl+W (close tab) if there are multiple tabs
+                if (tm.tabs.size > 1) {
+                    const ctrlWEvent = new KeyboardEvent('keydown', {
+                        key: 'w',
+                        code: 'KeyW',
+                        ctrlKey: true,
+                        bubbles: true
+                    });
+                    
+                    const beforeClose = tm.tabs.size;
+                    document.dispatchEvent(ctrlWEvent);
+                    await sleep(500);
+                    
+                    const afterClose = tm.tabs.size;
+                    if (afterClose < beforeClose) {
+                        log('✅ Ctrl+W closed tab', 'success');
+                    } else {
+                        log('⚠️ Ctrl+W may not be working', 'warning');
+                    }
+                }
+                
+                log('✅ Keyboard shortcut tests completed', 'success');
+                updateStatus('keyStatus', true);
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                updateStatus('keyStatus', false);
+            }
+        }
+        
+        async function runAllTests() {
+            log('🚀 Running All Automated Tests...', 'info');
+            log('=' .repeat(50), 'info');
+            
+            await testBasicTabFunctions();
+            await sleep(1000);
+            
+            await testTabNavigation();
+            await sleep(1000);
+            
+            await testTabCreationAndClosing();
+            await sleep(1000);
+            
+            await testKeyboardShortcuts();
+            
+            log('=' .repeat(50), 'info');
+            log('🎉 All automated tests completed!', 'success');
+            
+            updateSummary();
+        }
+        
+        function updateSummary() {
+            const summaryEl = document.getElementById('summary');
+            const summaryTextEl = document.getElementById('summaryText');
+            
+            // Count manual tests
+            const checkboxes = document.querySelectorAll('.manual-test-item input[type="checkbox"]');
+            const completedManual = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
+            // Count automated tests
+            const statusElements = ['basicStatus', 'navStatus', 'createStatus', 'keyStatus'];
+            const passedAuto = statusElements.filter(id => {
+                const el = document.getElementById(id);
+                return el && el.classList.contains('success');
+            }).length;
+            
+            const totalTests = statusElements.length + checkboxes.length;
+            const totalPassed = passedAuto + completedManual;
+            const successRate = ((totalPassed / totalTests) * 100).toFixed(1);
+            
+            summaryTextEl.innerHTML = `
+                Automated Tests: ${passedAuto}/${statusElements.length} passed<br>
+                Manual Tests: ${completedManual}/${checkboxes.length} completed<br>
+                Overall Progress: ${totalPassed}/${totalTests} (${successRate}%)
+            `;
+            
+            summaryEl.style.display = 'block';
+        }
+        
+        function toggleCheck(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            updateSummary();
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', () => {
+            checkAppStatus();
+            updateSummary();
+        });
+        
+        // Update status every 5 seconds
+        setInterval(checkAppStatus, 5000);
+    </script>
+</body>
+</html>

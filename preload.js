@@ -70,6 +70,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     importData: (data) => ipcRenderer.invoke('storage-import-data', data)
   },
 
+  // I18n (Internationalization) API
+  i18n: {
+    getTranslations: (langCode) => ipcRenderer.invoke('i18n-get-translations', langCode),
+    setLanguage: (langCode) => ipcRenderer.invoke('i18n-set-language', langCode),
+    getAvailableLanguages: () => ipcRenderer.invoke('i18n-get-available-languages'),
+    getCurrentLanguage: () => ipcRenderer.invoke('i18n-get-current-language'),
+    getLanguagePreference: () => ipcRenderer.invoke('i18n-get-language-preference')
+  },
+
   // Page Analysis API
   pageAnalysis: {
     analyze: (options) => ipcRenderer.invoke('page-analysis-analyze', options),

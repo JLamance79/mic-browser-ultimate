@@ -1,0 +1,359 @@
+{
+  "app": {
+    "title": "MIC Browser Ultimate - 网页自动化的未来",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "warning": "警告",
+    "info": "信息",
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "close": "关闭",
+    "open": "打开",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "update": "更新",
+    "refresh": "刷新",
+    "search": "搜索",
+    "settings": "设置",
+    "help": "帮助",
+    "about": "关于"
+  },
+  "menu": {
+    "file": "文件",
+    "edit": "编辑",
+    "view": "查看",
+    "window": "窗口",
+    "help": "帮助",
+    "newTab": "新建标签页",
+    "closeTab": "关闭标签页",
+    "openFile": "打开文件",
+    "saveAs": "另存为",
+    "print": "打印",
+    "quit": "退出",
+    "undo": "撤销",
+    "redo": "重做",
+    "cut": "剪切",
+    "copy": "复制",
+    "paste": "粘贴",
+    "selectAll": "全选",
+    "find": "查找",
+    "findNext": "查找下一个",
+    "reload": "重新加载",
+    "forceReload": "强制重新加载",
+    "toggleDevTools": "切换开发者工具",
+    "actualSize": "实际大小",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "toggleFullscreen": "切换全屏",
+    "minimize": "最小化",
+    "close": "关闭",
+    "documentation": "文档",
+    "reportIssue": "报告问题",
+    "aboutApp": "关于 MIC Browser Ultimate"
+  },
+  "tabs": {
+    "newTab": "新建标签页",
+    "closeTab": "关闭标签页",
+    "pinTab": "固定标签页",
+    "unpinTab": "取消固定标签页",
+    "muteTab": "静音标签页",
+    "unmuteTab": "取消静音",
+    "duplicateTab": "复制标签页",
+    "closeOtherTabs": "关闭其他标签页",
+    "closeTabsToRight": "关闭右侧标签页",
+    "reloadTab": "重新加载标签页"
+  },
+  "navigation": {
+    "back": "后退",
+    "forward": "前进",
+    "reload": "重新加载",
+    "home": "主页",
+    "addressBar": "输入网址或搜索词",
+    "goToUrl": "转到网址",
+    "bookmarks": "书签",
+    "history": "历史记录",
+    "downloads": "下载"
+  },
+  "chat": {
+    "title": "MIC 助手",
+    "placeholder": "向 MIC 助手询问任何问题...",
+    "send": "发送",
+    "clear": "清除聊天",
+    "thinking": "思考中...",
+    "error": "抱歉，遇到了错误。请重试。",
+    "noApiKey": "请在设置中配置您的 API 密钥以使用助手。",
+    "welcome": "您好！我是 MIC 助手。今天我可以为您做些什么？",
+    "suggestions": {
+      "automateTask": "帮我自动化一个任务",
+      "extractData": "从此页面提取数据",
+      "analyzeContent": "分析当前内容",
+      "navigateWebsite": "帮我导航这个网站"
+    }
+  },
+  "ocr": {
+    "title": "文档扫描器",
+    "uploadArea": "将文件拖放到此处或点击选择",
+    "supportedFormats": "支持的格式：JPG、PNG、PDF、TIFF、BMP、WEBP",
+    "processing": "正在处理文档...",
+    "extractedText": "提取的文本",
+    "confidence": "置信度",
+    "wordCount": "词数",
+    "lineCount": "行数",
+    "language": "语言",
+    "mode": "扫描模式",
+    "options": {
+      "basic": "基础",
+      "advanced": "高级",
+      "preprocessing": "预处理"
+    },
+    "languages": {
+      "eng": "英语",
+      "spa": "西班牙语",
+      "fra": "法语",
+      "deu": "德语",
+      "ita": "意大利语",
+      "por": "葡萄牙语",
+      "rus": "俄语",
+      "chi_sim": "中文（简体）",
+      "chi_tra": "中文（繁体）",
+      "jpn": "日语",
+      "kor": "韩语",
+      "ara": "阿拉伯语",
+      "hin": "印地语"
+    },
+    "modes": {
+      "auto": "自动检测（推荐）",
+      "singleBlock": "单一统一块",
+      "singleLine": "单一文本行",
+      "singleWord": "单个词",
+      "singleChar": "单个字符",
+      "rawLine": "原始行（无布局）"
+    },
+    "export": {
+      "title": "导出结果",
+      "txt": "导出为 TXT",
+      "json": "导出为 JSON",
+      "html": "导出为 HTML"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "categories": {
+      "general": "常规",
+      "appearance": "外观",
+      "privacy": "隐私与安全",
+      "performance": "性能",
+      "automation": "自动化",
+      "language": "语言与地区",
+      "advanced": "高级"
+    },
+    "general": {
+      "startupBehavior": "启动行为",
+      "defaultSearchEngine": "默认搜索引擎",
+      "homePage": "主页",
+      "newTabPage": "新标签页",
+      "downloads": "下载位置",
+      "notifications": "通知"
+    },
+    "appearance": {
+      "theme": "主题",
+      "themes": {
+        "dark": "深色",
+        "light": "浅色",
+        "auto": "自动（系统）"
+      },
+      "fontSize": "字体大小",
+      "fontSizes": {
+        "small": "小",
+        "medium": "中",
+        "large": "大"
+      },
+      "sidebarPosition": "侧边栏位置",
+      "positions": {
+        "left": "左侧",
+        "right": "右侧"
+      },
+      "compactMode": "紧凑模式",
+      "animations": "动画",
+      "transparency": "窗口透明度"
+    },
+    "language": {
+      "interfaceLanguage": "界面语言",
+      "dateFormat": "日期格式",
+      "timeFormat": "时间格式",
+      "numberFormat": "数字格式",
+      "region": "地区"
+    },
+    "privacy": {
+      "encryption": "数据加密",
+      "auditLogging": "审计日志",
+      "biometricAuth": "生物识别认证",
+      "cookiePolicy": "Cookie 策略",
+      "policies": {
+        "allow": "允许全部",
+        "strict": "严格",
+        "block": "阻止全部"
+      },
+      "trackingProtection": "跟踪保护",
+      "autoUpdates": "自动更新"
+    },
+    "performance": {
+      "memoryUsage": "内存使用",
+      "usage": {
+        "low": "低",
+        "normal": "正常",
+        "high": "高"
+      },
+      "backgroundTabs": "后台标签页",
+      "tabBehavior": {
+        "active": "保持活跃",
+        "suspend": "挂起",
+        "unload": "卸载"
+      },
+      "preloadPages": "预加载页面",
+      "hardwareAcceleration": "硬件加速"
+    },
+    "automation": {
+      "autoRecording": "自动录制",
+      "smartSuggestions": "智能建议",
+      "executeOnConfidence": "基于置信度执行",
+      "backupWorkflows": "备份工作流"
+    },
+    "voice": {
+      "language": "语音语言",
+      "sensitivity": "灵敏度",
+      "levels": {
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      },
+      "wakeWord": "唤醒词",
+      "continuous": "连续监听",
+      "feedback": "语音反馈"
+    }
+  },
+  "plugins": {
+    "title": "插件管理器",
+    "installed": "已安装的插件",
+    "available": "可用插件",
+    "developer": "开发者工具",
+    "enable": "启用",
+    "disable": "禁用",
+    "install": "安装",
+    "uninstall": "卸载",
+    "configure": "配置",
+    "update": "更新",
+    "createNew": "创建新插件",
+    "noPlugins": "未安装插件",
+    "loading": "加载插件中...",
+    "error": "插件加载错误"
+  },
+  "security": {
+    "title": "安全管理器",
+    "status": "安全状态",
+    "threats": "检测到的威胁",
+    "blocked": "已阻止的威胁",
+    "auditLog": "审计日志",
+    "clearLog": "清除日志",
+    "exportLog": "导出日志",
+    "secureConnection": "安全连接",
+    "encryption": "加密活跃",
+    "authentication": "需要认证"
+  },
+  "learning": {
+    "title": "学习系统",
+    "training": "训练进行中",
+    "suggestions": "AI 建议",
+    "patterns": "已学习模式",
+    "accuracy": "准确性",
+    "confidence": "置信水平",
+    "adaptiveUI": "自适应界面",
+    "personalizedFeatures": "个性化功能"
+  },
+  "crossTab": {
+    "title": "跨标签页传输",
+    "activeTransfers": "活跃传输",
+    "history": "传输历史",
+    "newTransfer": "新传输",
+    "selectSource": "选择源标签页",
+    "selectTarget": "选择目标标签页",
+    "transferData": "传输数据",
+    "noTransfers": "无活跃传输",
+    "transferComplete": "传输成功完成"
+  },
+  "analytics": {
+    "title": "分析仪表板",
+    "overview": "概览",
+    "usage": "使用统计",
+    "performance": "性能指标",
+    "trends": "趋势与洞察",
+    "sessions": "会话",
+    "pageViews": "页面浏览量",
+    "averageTime": "平均时间",
+    "mostVisited": "最常访问的站点"
+  },
+  "voice": {
+    "title": "语音助手",
+    "listening": "监听中...",
+    "processing": "处理中...",
+    "speakNow": "现在说话",
+    "microphoneAccess": "需要麦克风访问权限",
+    "voiceCommand": "语音命令",
+    "speechRecognition": "语音识别",
+    "textToSpeech": "文本转语音"
+  },
+  "notifications": {
+    "newUpdate": "新更新可用",
+    "updateReady": "更新准备安装",
+    "downloadComplete": "下载完成",
+    "pluginInstalled": "插件安装成功",
+    "securityAlert": "安全警报",
+    "taskCompleted": "任务完成",
+    "errorOccurred": "发生错误",
+    "connectionLost": "连接丢失",
+    "connectionRestored": "连接已恢复"
+  },
+  "updates": {
+    "title": "更新",
+    "checking": "检查更新中...",
+    "available": "更新可用",
+    "downloading": "下载更新中...",
+    "ready": "更新准备安装",
+    "upToDate": "您已是最新版本",
+    "install": "安装更新",
+    "later": "稍后安装",
+    "changelog": "新功能"
+  },
+  "errors": {
+    "pageLoadError": "页面加载失败",
+    "networkError": "网络连接错误",
+    "timeoutError": "请求超时",
+    "unauthorized": "未授权访问",
+    "notFound": "页面未找到",
+    "serverError": "服务器错误",
+    "unknownError": "发生未知错误",
+    "tryAgain": "重试",
+    "goBack": "返回",
+    "reportProblem": "报告问题"
+  },
+  "shortcuts": {
+    "newTab": "Ctrl+T",
+    "closeTab": "Ctrl+W",
+    "reopenTab": "Ctrl+Shift+T",
+    "nextTab": "Ctrl+Tab",
+    "prevTab": "Ctrl+Shift+Tab",
+    "reload": "Ctrl+R",
+    "forceReload": "Ctrl+Shift+R",
+    "devTools": "F12",
+    "find": "Ctrl+F",
+    "addressBar": "Ctrl+L",
+    "bookmarks": "Ctrl+B",
+    "history": "Ctrl+H",
+    "downloads": "Ctrl+J",
+    "settings": "Ctrl+,",
+    "fullscreen": "F11"
+  }
+}

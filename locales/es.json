@@ -1,0 +1,359 @@
+{
+  "app": {
+    "title": "MIC Browser Ultimate - El Futuro de la Automatización Web",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "refresh": "Actualizar",
+    "search": "Buscar",
+    "settings": "Configuración",
+    "help": "Ayuda",
+    "about": "Acerca de"
+  },
+  "menu": {
+    "file": "Archivo",
+    "edit": "Editar",
+    "view": "Ver",
+    "window": "Ventana",
+    "help": "Ayuda",
+    "newTab": "Nueva Pestaña",
+    "closeTab": "Cerrar Pestaña",
+    "openFile": "Abrir Archivo",
+    "saveAs": "Guardar Como",
+    "print": "Imprimir",
+    "quit": "Salir",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "cut": "Cortar",
+    "copy": "Copiar",
+    "paste": "Pegar",
+    "selectAll": "Seleccionar Todo",
+    "find": "Buscar",
+    "findNext": "Buscar Siguiente",
+    "reload": "Recargar",
+    "forceReload": "Forzar Recarga",
+    "toggleDevTools": "Alternar Herramientas de Desarrollador",
+    "actualSize": "Tamaño Real",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "toggleFullscreen": "Alternar Pantalla Completa",
+    "minimize": "Minimizar",
+    "close": "Cerrar",
+    "documentation": "Documentación",
+    "reportIssue": "Reportar Problema",
+    "aboutApp": "Acerca de MIC Browser Ultimate"
+  },
+  "tabs": {
+    "newTab": "Nueva Pestaña",
+    "closeTab": "Cerrar Pestaña",
+    "pinTab": "Fijar Pestaña",
+    "unpinTab": "Desfijar Pestaña",
+    "muteTab": "Silenciar Pestaña",
+    "unmuteTab": "Activar Sonido",
+    "duplicateTab": "Duplicar Pestaña",
+    "closeOtherTabs": "Cerrar Otras Pestañas",
+    "closeTabsToRight": "Cerrar Pestañas a la Derecha",
+    "reloadTab": "Recargar Pestaña"
+  },
+  "navigation": {
+    "back": "Atrás",
+    "forward": "Adelante",
+    "reload": "Recargar",
+    "home": "Inicio",
+    "addressBar": "Ingrese URL o término de búsqueda",
+    "goToUrl": "Ir a URL",
+    "bookmarks": "Marcadores",
+    "history": "Historial",
+    "downloads": "Descargas"
+  },
+  "chat": {
+    "title": "Asistente MIC",
+    "placeholder": "Pregúntale cualquier cosa al Asistente MIC...",
+    "send": "Enviar",
+    "clear": "Limpiar Chat",
+    "thinking": "Pensando...",
+    "error": "Lo siento, encontré un error. Inténtalo de nuevo.",
+    "noApiKey": "Configura tu clave API en ajustes para usar el asistente.",
+    "welcome": "¡Hola! Soy el Asistente MIC. ¿Cómo puedo ayudarte hoy?",
+    "suggestions": {
+      "automateTask": "Ayúdame a automatizar una tarea",
+      "extractData": "Extraer datos de esta página",
+      "analyzeContent": "Analizar el contenido actual",
+      "navigateWebsite": "Ayúdame a navegar este sitio web"
+    }
+  },
+  "ocr": {
+    "title": "Escáner de Documentos",
+    "uploadArea": "Suelta archivos aquí o haz clic para seleccionar",
+    "supportedFormats": "Formatos soportados: JPG, PNG, PDF, TIFF, BMP, WEBP",
+    "processing": "Procesando documento...",
+    "extractedText": "Texto Extraído",
+    "confidence": "Confianza",
+    "wordCount": "Palabras",
+    "lineCount": "Líneas",
+    "language": "Idioma",
+    "mode": "Modo de Escaneo",
+    "options": {
+      "basic": "Básico",
+      "advanced": "Avanzado",
+      "preprocessing": "Preprocesamiento"
+    },
+    "languages": {
+      "eng": "Inglés",
+      "spa": "Español",
+      "fra": "Francés",
+      "deu": "Alemán",
+      "ita": "Italiano",
+      "por": "Portugués",
+      "rus": "Ruso",
+      "chi_sim": "Chino (Simplificado)",
+      "chi_tra": "Chino (Tradicional)",
+      "jpn": "Japonés",
+      "kor": "Coreano",
+      "ara": "Árabe",
+      "hin": "Hindi"
+    },
+    "modes": {
+      "auto": "Detección Automática (Recomendado)",
+      "singleBlock": "Bloque Uniforme Único",
+      "singleLine": "Línea de Texto Única",
+      "singleWord": "Palabra Única",
+      "singleChar": "Carácter Único",
+      "rawLine": "Línea Cruda (Sin Diseño)"
+    },
+    "export": {
+      "title": "Exportar Resultados",
+      "txt": "Exportar como TXT",
+      "json": "Exportar como JSON",
+      "html": "Exportar como HTML"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "categories": {
+      "general": "General",
+      "appearance": "Apariencia",
+      "privacy": "Privacidad y Seguridad",
+      "performance": "Rendimiento",
+      "automation": "Automatización",
+      "language": "Idioma y Región",
+      "advanced": "Avanzado"
+    },
+    "general": {
+      "startupBehavior": "Comportamiento de Inicio",
+      "defaultSearchEngine": "Motor de Búsqueda Predeterminado",
+      "homePage": "Página de Inicio",
+      "newTabPage": "Página de Nueva Pestaña",
+      "downloads": "Ubicación de Descargas",
+      "notifications": "Notificaciones"
+    },
+    "appearance": {
+      "theme": "Tema",
+      "themes": {
+        "dark": "Oscuro",
+        "light": "Claro",
+        "auto": "Automático (Sistema)"
+      },
+      "fontSize": "Tamaño de Fuente",
+      "fontSizes": {
+        "small": "Pequeño",
+        "medium": "Mediano",
+        "large": "Grande"
+      },
+      "sidebarPosition": "Posición de la Barra Lateral",
+      "positions": {
+        "left": "Izquierda",
+        "right": "Derecha"
+      },
+      "compactMode": "Modo Compacto",
+      "animations": "Animaciones",
+      "transparency": "Transparencia de Ventana"
+    },
+    "language": {
+      "interfaceLanguage": "Idioma de la Interfaz",
+      "dateFormat": "Formato de Fecha",
+      "timeFormat": "Formato de Hora",
+      "numberFormat": "Formato de Número",
+      "region": "Región"
+    },
+    "privacy": {
+      "encryption": "Encriptación de Datos",
+      "auditLogging": "Registro de Auditoría",
+      "biometricAuth": "Autenticación Biométrica",
+      "cookiePolicy": "Política de Cookies",
+      "policies": {
+        "allow": "Permitir Todas",
+        "strict": "Estricta",
+        "block": "Bloquear Todas"
+      },
+      "trackingProtection": "Protección contra Rastreo",
+      "autoUpdates": "Actualizaciones Automáticas"
+    },
+    "performance": {
+      "memoryUsage": "Uso de Memoria",
+      "usage": {
+        "low": "Bajo",
+        "normal": "Normal",
+        "high": "Alto"
+      },
+      "backgroundTabs": "Pestañas en Segundo Plano",
+      "tabBehavior": {
+        "active": "Mantener Activas",
+        "suspend": "Suspender",
+        "unload": "Descargar"
+      },
+      "preloadPages": "Precargar Páginas",
+      "hardwareAcceleration": "Aceleración por Hardware"
+    },
+    "automation": {
+      "autoRecording": "Grabación Automática",
+      "smartSuggestions": "Sugerencias Inteligentes",
+      "executeOnConfidence": "Ejecutar por Confianza",
+      "backupWorkflows": "Respaldar Flujos de Trabajo"
+    },
+    "voice": {
+      "language": "Idioma de Voz",
+      "sensitivity": "Sensibilidad",
+      "levels": {
+        "low": "Baja",
+        "medium": "Media",
+        "high": "Alta"
+      },
+      "wakeWord": "Palabra de Activación",
+      "continuous": "Escucha Continua",
+      "feedback": "Retroalimentación por Voz"
+    }
+  },
+  "plugins": {
+    "title": "Gestor de Plugins",
+    "installed": "Plugins Instalados",
+    "available": "Plugins Disponibles",
+    "developer": "Herramientas de Desarrollador",
+    "enable": "Habilitar",
+    "disable": "Deshabilitar",
+    "install": "Instalar",
+    "uninstall": "Desinstalar",
+    "configure": "Configurar",
+    "update": "Actualizar",
+    "createNew": "Crear Nuevo Plugin",
+    "noPlugins": "No hay plugins instalados",
+    "loading": "Cargando plugins...",
+    "error": "Error cargando plugin"
+  },
+  "security": {
+    "title": "Gestor de Seguridad",
+    "status": "Estado de Seguridad",
+    "threats": "Amenazas Detectadas",
+    "blocked": "Amenazas Bloqueadas",
+    "auditLog": "Registro de Auditoría",
+    "clearLog": "Limpiar Registro",
+    "exportLog": "Exportar Registro",
+    "secureConnection": "Conexión Segura",
+    "encryption": "Encriptación Activa",
+    "authentication": "Autenticación Requerida"
+  },
+  "learning": {
+    "title": "Sistema de Aprendizaje",
+    "training": "Entrenamiento en Progreso",
+    "suggestions": "Sugerencias de IA",
+    "patterns": "Patrones Aprendidos",
+    "accuracy": "Precisión",
+    "confidence": "Nivel de Confianza",
+    "adaptiveUI": "Interfaz Adaptativa",
+    "personalizedFeatures": "Características Personalizadas"
+  },
+  "crossTab": {
+    "title": "Transferencia Entre Pestañas",
+    "activeTransfers": "Transferencias Activas",
+    "history": "Historial de Transferencias",
+    "newTransfer": "Nueva Transferencia",
+    "selectSource": "Seleccionar Pestaña Origen",
+    "selectTarget": "Seleccionar Pestaña Destino",
+    "transferData": "Transferir Datos",
+    "noTransfers": "No hay transferencias activas",
+    "transferComplete": "Transferencia completada con éxito"
+  },
+  "analytics": {
+    "title": "Panel de Análisis",
+    "overview": "Resumen",
+    "usage": "Estadísticas de Uso",
+    "performance": "Métricas de Rendimiento",
+    "trends": "Tendencias y Perspectivas",
+    "sessions": "Sesiones",
+    "pageViews": "Vistas de Página",
+    "averageTime": "Tiempo Promedio",
+    "mostVisited": "Sitios Más Visitados"
+  },
+  "voice": {
+    "title": "Asistente de Voz",
+    "listening": "Escuchando...",
+    "processing": "Procesando...",
+    "speakNow": "Habla ahora",
+    "microphoneAccess": "Se requiere acceso al micrófono",
+    "voiceCommand": "Comando de Voz",
+    "speechRecognition": "Reconocimiento de Voz",
+    "textToSpeech": "Texto a Voz"
+  },
+  "notifications": {
+    "newUpdate": "Nueva actualización disponible",
+    "updateReady": "Actualización lista para instalar",
+    "downloadComplete": "Descarga completada",
+    "pluginInstalled": "Plugin instalado con éxito",
+    "securityAlert": "Alerta de seguridad",
+    "taskCompleted": "Tarea completada",
+    "errorOccurred": "Ha ocurrido un error",
+    "connectionLost": "Conexión perdida",
+    "connectionRestored": "Conexión restablecida"
+  },
+  "updates": {
+    "title": "Actualizaciones",
+    "checking": "Verificando actualizaciones...",
+    "available": "Actualización disponible",
+    "downloading": "Descargando actualización...",
+    "ready": "Actualización lista para instalar",
+    "upToDate": "Estás al día",
+    "install": "Instalar Actualización",
+    "later": "Instalar Más Tarde",
+    "changelog": "Novedades"
+  },
+  "errors": {
+    "pageLoadError": "Error al cargar la página",
+    "networkError": "Error de conexión de red",
+    "timeoutError": "Tiempo de espera agotado",
+    "unauthorized": "Acceso no autorizado",
+    "notFound": "Página no encontrada",
+    "serverError": "Error del servidor",
+    "unknownError": "Error desconocido",
+    "tryAgain": "Intentar de nuevo",
+    "goBack": "Regresar",
+    "reportProblem": "Reportar problema"
+  },
+  "shortcuts": {
+    "newTab": "Ctrl+T",
+    "closeTab": "Ctrl+W",
+    "reopenTab": "Ctrl+Shift+T",
+    "nextTab": "Ctrl+Tab",
+    "prevTab": "Ctrl+Shift+Tab",
+    "reload": "Ctrl+R",
+    "forceReload": "Ctrl+Shift+R",
+    "devTools": "F12",
+    "find": "Ctrl+F",
+    "addressBar": "Ctrl+L",
+    "bookmarks": "Ctrl+B",
+    "history": "Ctrl+H",
+    "downloads": "Ctrl+J",
+    "settings": "Ctrl+,",
+    "fullscreen": "F11"
+  }
+}

@@ -1,0 +1,359 @@
+{
+  "app": {
+    "title": "MIC Browser Ultimate - ウェブ自動化の未来",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "warning": "警告",
+    "info": "情報",
+    "confirm": "確認",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "close": "閉じる",
+    "open": "開く",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "update": "更新",
+    "refresh": "更新",
+    "search": "検索",
+    "settings": "設定",
+    "help": "ヘルプ",
+    "about": "について"
+  },
+  "menu": {
+    "file": "ファイル",
+    "edit": "編集",
+    "view": "表示",
+    "window": "ウィンドウ",
+    "help": "ヘルプ",
+    "newTab": "新しいタブ",
+    "closeTab": "タブを閉じる",
+    "openFile": "ファイルを開く",
+    "saveAs": "名前を付けて保存",
+    "print": "印刷",
+    "quit": "終了",
+    "undo": "元に戻す",
+    "redo": "やり直し",
+    "cut": "切り取り",
+    "copy": "コピー",
+    "paste": "貼り付け",
+    "selectAll": "すべて選択",
+    "find": "検索",
+    "findNext": "次を検索",
+    "reload": "再読み込み",
+    "forceReload": "強制再読み込み",
+    "toggleDevTools": "開発者ツールの切り替え",
+    "actualSize": "実際のサイズ",
+    "zoomIn": "拡大",
+    "zoomOut": "縮小",
+    "toggleFullscreen": "フルスクリーンの切り替え",
+    "minimize": "最小化",
+    "close": "閉じる",
+    "documentation": "ドキュメント",
+    "reportIssue": "問題を報告",
+    "aboutApp": "MIC Browser Ultimateについて"
+  },
+  "tabs": {
+    "newTab": "新しいタブ",
+    "closeTab": "タブを閉じる",
+    "pinTab": "タブを固定",
+    "unpinTab": "タブの固定を解除",
+    "muteTab": "タブをミュート",
+    "unmuteTab": "ミュートを解除",
+    "duplicateTab": "タブを複製",
+    "closeOtherTabs": "他のタブを閉じる",
+    "closeTabsToRight": "右側のタブを閉じる",
+    "reloadTab": "タブを再読み込み"
+  },
+  "navigation": {
+    "back": "戻る",
+    "forward": "進む",
+    "reload": "再読み込み",
+    "home": "ホーム",
+    "addressBar": "URLまたは検索語を入力",
+    "goToUrl": "URLに移動",
+    "bookmarks": "ブックマーク",
+    "history": "履歴",
+    "downloads": "ダウンロード"
+  },
+  "chat": {
+    "title": "MICアシスタント",
+    "placeholder": "MICアシスタントに何でも聞いてください...",
+    "send": "送信",
+    "clear": "チャットをクリア",
+    "thinking": "考えています...",
+    "error": "申し訳ございませんが、エラーが発生しました。もう一度お試しください。",
+    "noApiKey": "アシスタントを使用するには、設定でAPIキーを設定してください。",
+    "welcome": "こんにちは！私はMICアシスタントです。今日はどのようにお手伝いできますか？",
+    "suggestions": {
+      "automateTask": "タスクの自動化を手伝って",
+      "extractData": "このページからデータを抽出",
+      "analyzeContent": "現在のコンテンツを分析",
+      "navigateWebsite": "このウェブサイトのナビゲーションを手伝って"
+    }
+  },
+  "ocr": {
+    "title": "ドキュメントスキャナー",
+    "uploadArea": "ファイルをここにドロップするか、クリックして選択",
+    "supportedFormats": "サポート形式：JPG、PNG、PDF、TIFF、BMP、WEBP",
+    "processing": "ドキュメントを処理中...",
+    "extractedText": "抽出されたテキスト",
+    "confidence": "信頼度",
+    "wordCount": "単語数",
+    "lineCount": "行数",
+    "language": "言語",
+    "mode": "スキャンモード",
+    "options": {
+      "basic": "基本",
+      "advanced": "詳細",
+      "preprocessing": "前処理"
+    },
+    "languages": {
+      "eng": "英語",
+      "spa": "スペイン語",
+      "fra": "フランス語",
+      "deu": "ドイツ語",
+      "ita": "イタリア語",
+      "por": "ポルトガル語",
+      "rus": "ロシア語",
+      "chi_sim": "中国語（簡体字）",
+      "chi_tra": "中国語（繁体字）",
+      "jpn": "日本語",
+      "kor": "韓国語",
+      "ara": "アラビア語",
+      "hin": "ヒンディー語"
+    },
+    "modes": {
+      "auto": "自動検出（推奨）",
+      "singleBlock": "単一ブロック",
+      "singleLine": "単一行",
+      "singleWord": "単一単語",
+      "singleChar": "単一文字",
+      "rawLine": "生の行（レイアウトなし）"
+    },
+    "export": {
+      "title": "結果をエクスポート",
+      "txt": "TXTとしてエクスポート",
+      "json": "JSONとしてエクスポート",
+      "html": "HTMLとしてエクスポート"
+    }
+  },
+  "settings": {
+    "title": "設定",
+    "categories": {
+      "general": "一般",
+      "appearance": "外観",
+      "privacy": "プライバシーとセキュリティ",
+      "performance": "パフォーマンス",
+      "automation": "自動化",
+      "language": "言語と地域",
+      "advanced": "詳細設定"
+    },
+    "general": {
+      "startupBehavior": "起動時の動作",
+      "defaultSearchEngine": "既定の検索エンジン",
+      "homePage": "ホームページ",
+      "newTabPage": "新しいタブページ",
+      "downloads": "ダウンロード場所",
+      "notifications": "通知"
+    },
+    "appearance": {
+      "theme": "テーマ",
+      "themes": {
+        "dark": "ダーク",
+        "light": "ライト",
+        "auto": "自動（システム）"
+      },
+      "fontSize": "フォントサイズ",
+      "fontSizes": {
+        "small": "小",
+        "medium": "中",
+        "large": "大"
+      },
+      "sidebarPosition": "サイドバーの位置",
+      "positions": {
+        "left": "左",
+        "right": "右"
+      },
+      "compactMode": "コンパクトモード",
+      "animations": "アニメーション",
+      "transparency": "ウィンドウの透明度"
+    },
+    "language": {
+      "interfaceLanguage": "インターフェース言語",
+      "dateFormat": "日付形式",
+      "timeFormat": "時刻形式",
+      "numberFormat": "数値形式",
+      "region": "地域"
+    },
+    "privacy": {
+      "encryption": "データ暗号化",
+      "auditLogging": "監査ログ",
+      "biometricAuth": "生体認証",
+      "cookiePolicy": "Cookieポリシー",
+      "policies": {
+        "allow": "すべて許可",
+        "strict": "厳格",
+        "block": "すべてブロック"
+      },
+      "trackingProtection": "トラッキング保護",
+      "autoUpdates": "自動更新"
+    },
+    "performance": {
+      "memoryUsage": "メモリ使用量",
+      "usage": {
+        "low": "低",
+        "normal": "標準",
+        "high": "高"
+      },
+      "backgroundTabs": "バックグラウンドタブ",
+      "tabBehavior": {
+        "active": "アクティブに保つ",
+        "suspend": "一時停止",
+        "unload": "アンロード"
+      },
+      "preloadPages": "ページの先読み",
+      "hardwareAcceleration": "ハードウェアアクセラレーション"
+    },
+    "automation": {
+      "autoRecording": "自動記録",
+      "smartSuggestions": "スマート提案",
+      "executeOnConfidence": "信頼度での実行",
+      "backupWorkflows": "ワークフローのバックアップ"
+    },
+    "voice": {
+      "language": "音声言語",
+      "sensitivity": "感度",
+      "levels": {
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      },
+      "wakeWord": "ウェイクワード",
+      "continuous": "連続リスニング",
+      "feedback": "音声フィードバック"
+    }
+  },
+  "plugins": {
+    "title": "プラグインマネージャー",
+    "installed": "インストール済みプラグイン",
+    "available": "利用可能なプラグイン",
+    "developer": "開発者ツール",
+    "enable": "有効化",
+    "disable": "無効化",
+    "install": "インストール",
+    "uninstall": "アンインストール",
+    "configure": "設定",
+    "update": "更新",
+    "createNew": "新しいプラグインを作成",
+    "noPlugins": "プラグインがインストールされていません",
+    "loading": "プラグインを読み込み中...",
+    "error": "プラグインの読み込みエラー"
+  },
+  "security": {
+    "title": "セキュリティマネージャー",
+    "status": "セキュリティステータス",
+    "threats": "検出された脅威",
+    "blocked": "ブロックされた脅威",
+    "auditLog": "監査ログ",
+    "clearLog": "ログをクリア",
+    "exportLog": "ログをエクスポート",
+    "secureConnection": "セキュア接続",
+    "encryption": "暗号化アクティブ",
+    "authentication": "認証が必要"
+  },
+  "learning": {
+    "title": "学習システム",
+    "training": "トレーニング進行中",
+    "suggestions": "AI提案",
+    "patterns": "学習済みパターン",
+    "accuracy": "精度",
+    "confidence": "信頼度レベル",
+    "adaptiveUI": "適応インターフェース",
+    "personalizedFeatures": "パーソナライズされた機能"
+  },
+  "crossTab": {
+    "title": "タブ間転送",
+    "activeTransfers": "アクティブな転送",
+    "history": "転送履歴",
+    "newTransfer": "新しい転送",
+    "selectSource": "ソースタブを選択",
+    "selectTarget": "ターゲットタブを選択",
+    "transferData": "データを転送",
+    "noTransfers": "アクティブな転送がありません",
+    "transferComplete": "転送が正常に完了しました"
+  },
+  "analytics": {
+    "title": "アナリティクスダッシュボード",
+    "overview": "概要",
+    "usage": "使用統計",
+    "performance": "パフォーマンス指標",
+    "trends": "トレンドと洞察",
+    "sessions": "セッション",
+    "pageViews": "ページビュー",
+    "averageTime": "平均時間",
+    "mostVisited": "最も訪問されたサイト"
+  },
+  "voice": {
+    "title": "音声アシスタント",
+    "listening": "リスニング中...",
+    "processing": "処理中...",
+    "speakNow": "今話してください",
+    "microphoneAccess": "マイクへのアクセスが必要",
+    "voiceCommand": "音声コマンド",
+    "speechRecognition": "音声認識",
+    "textToSpeech": "テキスト読み上げ"
+  },
+  "notifications": {
+    "newUpdate": "新しいアップデートが利用可能",
+    "updateReady": "アップデートのインストール準備完了",
+    "downloadComplete": "ダウンロード完了",
+    "pluginInstalled": "プラグインが正常にインストールされました",
+    "securityAlert": "セキュリティアラート",
+    "taskCompleted": "タスク完了",
+    "errorOccurred": "エラーが発生しました",
+    "connectionLost": "接続が失われました",
+    "connectionRestored": "接続が復旧しました"
+  },
+  "updates": {
+    "title": "アップデート",
+    "checking": "アップデートを確認中...",
+    "available": "アップデートが利用可能",
+    "downloading": "アップデートをダウンロード中...",
+    "ready": "アップデートのインストール準備完了",
+    "upToDate": "最新の状態です",
+    "install": "アップデートをインストール",
+    "later": "後でインストール",
+    "changelog": "新機能"
+  },
+  "errors": {
+    "pageLoadError": "ページの読み込みに失敗",
+    "networkError": "ネットワーク接続エラー",
+    "timeoutError": "リクエストタイムアウト",
+    "unauthorized": "不正なアクセス",
+    "notFound": "ページが見つかりません",
+    "serverError": "サーバーエラー",
+    "unknownError": "不明なエラーが発生",
+    "tryAgain": "再試行",
+    "goBack": "戻る",
+    "reportProblem": "問題を報告"
+  },
+  "shortcuts": {
+    "newTab": "Ctrl+T",
+    "closeTab": "Ctrl+W",
+    "reopenTab": "Ctrl+Shift+T",
+    "nextTab": "Ctrl+Tab",
+    "prevTab": "Ctrl+Shift+Tab",
+    "reload": "Ctrl+R",
+    "forceReload": "Ctrl+Shift+R",
+    "devTools": "F12",
+    "find": "Ctrl+F",
+    "addressBar": "Ctrl+L",
+    "bookmarks": "Ctrl+B",
+    "history": "Ctrl+H",
+    "downloads": "Ctrl+J",
+    "settings": "Ctrl+,",
+    "fullscreen": "F11"
+  }
+}
