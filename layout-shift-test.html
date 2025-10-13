@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Shift Test - MIC Browser</title>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"></noscript>
+    <style>
+        :root {
+            --theme-background: #0a0a0a;
+            --theme-surface: #1a1a2e;
+            --theme-primary: #667eea;
+            --theme-text: #e0e0e0;
+            --theme-secondary: #a0a0a0;
+            --primary-gradient: linear-gradient(135deg, var(--theme-primary) 0%, #764ba2 100%);
+            --dark-bg: var(--theme-background);
+            --dark-surface: var(--theme-surface);
+            --dark-border: #2a2a3e;
+            --text-primary: var(--theme-text);
+            --text-secondary: var(--theme-secondary);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Prevent layout shift from Font Awesome icons */
+        .fas, .far, .fab {
+            display: inline-block;
+            width: 1em;
+            text-align: center;
+        }
+
+        /* Ensure icons don't cause layout shift before loading */
+        .fas:before, .far:before, .fab:before {
+            content: '';
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', Arial, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            contain: layout style;
+        }
+
+        /* Enhanced Browser Header */
+        .browser-header {
+            background: var(--primary-gradient);
+            border-bottom: 1px solid var(--dark-border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            min-height: 120px;
+            contain: layout style;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            min-height: 60px;
+            contain: layout;
+        }
+
+        /* Enhanced Tab Container */
+        .tab-container {
+            background: rgba(0,0,0,0.2);
+            padding: 4px 8px 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            display: flex;
+            position: relative;
+            border-bottom: 1px solid var(--dark-border);
+            min-height: 48px;
+            max-height: 48px;
+            align-items: flex-start;
+        }
+
+        .tabs-wrapper {
+            display: flex;
+            gap: 2px;
+            min-width: max-content;
+            position: relative;
+        }
+
+        .new-tab {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text-secondary);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            margin-left: 8px;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+            min-width: 32px;
+            min-height: 32px;
+            box-sizing: border-box;
+        }
+
+        .new-tab:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Main Layout */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+            contain: layout style;
+        }
+
+        .content-area {
+            flex: 1;
+            background: var(--dark-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Test elements */
+        .test-element {
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            margin: 10px;
+        }
+
+        .layout-shift-score {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout-shift-score" id="clsScore">
+        CLS Score: <span id="clsValue">0</span>
+    </div>
+
+    <header class="browser-header">
+        <nav class="nav-controls">
+            <div class="test-element">
+                Navigation Controls
+                <i class="fas fa-home"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </nav>
+
+        <div class="tab-container">
+            <div class="tabs-wrapper">
+                <div class="test-element">Sample Tab</div>
+            </div>
+            <button class="new-tab" title="New Tab">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="content-area">
+            <div class="test-element">
+                Main Content Area - Testing Layout Stability
+                <br>
+                <i class="fas fa-check-circle"></i> Layout shift optimizations applied
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Layout shift detection
+        let clsValue = 0;
+        let clsEntries = [];
+
+        const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                if (!entry.hadRecentInput) {
+                    clsValue += entry.value;
+                    clsEntries.push(entry);
+                    document.getElementById('clsValue').textContent = clsValue.toFixed(4);
+                }
+            }
+        });
+
+        observer.observe({type: 'layout-shift', buffered: true});
+
+        // Simulate some dynamic content loading to test layout stability
+        setTimeout(() => {
+            console.log('Layout shift test completed');
+            console.log('Final CLS score:', clsValue);
+            console.log('Layout shift entries:', clsEntries);
+        }, 3000);
+
+        // Add new tab functionality for testing
+        document.querySelector('.new-tab').addEventListener('click', () => {
+            const tabsWrapper = document.querySelector('.tabs-wrapper');
+            const newTab = document.createElement('div');
+            newTab.className = 'test-element';
+            newTab.textContent = 'New Tab ' + (tabsWrapper.children.length + 1);
+            tabsWrapper.appendChild(newTab);
+        });
+    </script>
+</body>
+</html>

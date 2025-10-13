@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "start:no-devtools": "electron . --no-devtools",
     "dev": "electron . --dev",
     "lint": "eslint . --ext .js",
     "format": "prettier --write \"**/*.{js,json,md}\"",
@@ -29,6 +30,11 @@
     "release:publish": "node build-release.js --publish",
     "update-server": "node update-server.js",
     "test-updates": "node test-updates.js",
+    "release-helper": "node release-helper.js",
+    "version:patch": "node release-helper.js patch",
+    "version:minor": "node release-helper.js minor",
+    "version:major": "node release-helper.js major",
+    "release:auto": "node release-helper.js publish",
     "clean": "rimraf dist node_modules/.cache",
     "reinstall": "rimraf node_modules package-lock.json && npm install",
     "postinstall": "electron-builder install-app-deps"
@@ -58,6 +64,7 @@
     "@anthropic-ai/sdk": "^0.65.0",
     "@supabase/supabase-js": "^2.74.0",
     "dotenv": "^17.2.3",
+    "electron-google-analytics": "^1.0.2",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.6.2",
     "express": "^5.1.0",
@@ -68,7 +75,8 @@
     "sharp": "^0.34.4",
     "socket.io": "^4.8.1",
     "tesseract.js": "^6.0.1",
-    "to-ico": "^1.1.5"
+    "to-ico": "^1.1.5",
+    "universal-analytics": "^0.5.3"
   },
   "repository": {
     "type": "git",
@@ -104,6 +112,9 @@
       "assets/**",
       "package.json",
       "node_modules/**",
+      "!node_modules/electron-*/**/*",
+      "!**/*.map",
+      "!**/*.md",
       "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
       "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
       "!node_modules/*.d.ts",
@@ -183,7 +194,8 @@
       "deleteAppDataOnUninstall": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "MIC Browser Ultimate"
+      "shortcutName": "MIC Browser Ultimate",
+      "differentialPackage": true
     },
     "linux": {
       "target": [

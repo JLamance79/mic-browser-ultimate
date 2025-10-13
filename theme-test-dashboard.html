@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme System Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            transition: all 0.3s ease;
+            background: var(--background, #1a1a1a);
+            color: var(--text, #ffffff);
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--surface, #2d2d2d);
+            border-radius: 8px;
+            border: 1px solid var(--accent, #007acc);
+        }
+        
+        h1 {
+            color: var(--primary, #007acc);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .status-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--surface, #2d2d2d);
+            border: 1px solid var(--secondary, #404040);
+            border-radius: 6px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        
+        .status-indicator {
+            font-weight: bold;
+        }
+        
+        .success { color: var(--success, #4caf50); }
+        .error { color: var(--danger, #f44336); }
+        .warning { color: var(--warning, #ff9800); }
+        
+        .theme-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .theme-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: var(--primary, #007acc);
+            color: var(--surface, #ffffff);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-btn:hover {
+            background: var(--accent, #0099ff);
+            transform: translateY(-2px);
+        }
+        
+        .log-area {
+            background: var(--surface, #000000);
+            color: var(--text, #00ff00);
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--secondary, #404040);
+        }
+        
+        .current-theme {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            background: var(--accent, #007acc);
+            color: var(--surface, #ffffff);
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎨 Theme System Test Dashboard</h1>
+        
+        <div class="current-theme" id="currentTheme">
+            Current Theme: Loading...
+        </div>
+        
+        <div class="status-section">
+            <h3>📋 System Status</h3>
+            <div class="status-item">
+                <span>ElectronAPI Available:</span>
+                <span class="status-indicator" id="electronApiStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>Theme API Methods:</span>
+                <span class="status-indicator" id="themeApiStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>ThemeManager Available:</span>
+                <span class="status-indicator" id="themeManagerStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>IPC Communication:</span>
+                <span class="status-indicator" id="ipcStatus">Checking...</span>
+            </div>
+        </div>
+        
+        <div class="theme-buttons" id="themeButtons">
+            <button class="theme-btn" onclick="testTheme('dark')">🌙 Dark Theme</button>
+            <button class="theme-btn" onclick="testTheme('light')">☀️ Light Theme</button>
+            <button class="theme-btn" onclick="testTheme('blue')">🔵 Blue Theme</button>
+            <button class="theme-btn" onclick="testTheme('purple')">🟣 Purple Theme</button>
+            <button class="theme-btn" onclick="runFullTest()">🧪 Run Full Test</button>
+            <button class="theme-btn" onclick="clearLog()">🗑️ Clear Log</button>
+        </div>
+        
+        <div class="status-section">
+            <h3>📝 Test Log</h3>
+            <div class="log-area" id="testLog"></div>
+        </div>
+    </div>
+
+    <script>
+        let logElement;
+        
+        function log(message, type = 'info') {
+            if (!logElement) {
+                logElement = document.getElementById('testLog');
+            }
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#00ff00',
+                success: '#4caf50',
+                error: '#f44336',
+                warning: '#ff9800'
+            };
+            
+            const color = colors[type] || colors.info;
+            logElement.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function updateStatus(elementId, status, isSuccess) {
+            const element = document.getElementById(elementId);
+            element.textContent = status;
+            element.className = 'status-indicator ' + (isSuccess ? 'success' : 'error');
+        }
+        
+        function updateCurrentTheme(themeName) {
+            document.getElementById('currentTheme').textContent = `Current Theme: ${themeName}`;
+        }
+        
+        function clearLog() {
+            document.getElementById('testLog').innerHTML = '';
+            log('Log cleared', 'info');
+        }
+        
+        async function testTheme(themeName) {
+            try {
+                log(`Switching to ${themeName} theme...`, 'info');
+                
+                if (!window.electronAPI) {
+                    throw new Error('ElectronAPI not available');
+                }
+                
+                await window.electronAPI.setTheme(themeName);
+                log(`✅ Successfully switched to ${themeName} theme`, 'success');
+                updateCurrentTheme(themeName);
+                
+            } catch (error) {
+                log(`❌ Failed to switch theme: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runFullTest() {
+            log('🚀 Starting full theme system test...', 'info');
+            
+            try {
+                // Test all themes in sequence
+                const themes = ['dark', 'light', 'blue', 'purple', 'dark'];
+                
+                for (let i = 0; i < themes.length; i++) {
+                    const theme = themes[i];
+                    log(`Testing theme ${i + 1}/${themes.length}: ${theme}`, 'info');
+                    
+                    await window.electronAPI.setTheme(theme);
+                    updateCurrentTheme(theme);
+                    
+                    // Wait a bit between switches to see the effect
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                
+                log('🎉 Full theme test completed successfully!', 'success');
+                
+            } catch (error) {
+                log(`❌ Full test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Initialize the test dashboard
+        async function initializeDashboard() {
+            log('🔧 Initializing theme test dashboard...', 'info');
+            
+            // Check ElectronAPI
+            if (window.electronAPI) {
+                updateStatus('electronApiStatus', 'Available', true);
+                log('✅ ElectronAPI detected', 'success');
+                
+                // Check theme methods
+                const themeMethods = ['setTheme', 'getTheme', 'getAvailableThemes'];
+                const availableMethods = themeMethods.filter(method => 
+                    typeof window.electronAPI[method] === 'function'
+                );
+                
+                if (availableMethods.length === themeMethods.length) {
+                    updateStatus('themeApiStatus', 'All methods available', true);
+                    log('✅ All theme API methods available', 'success');
+                } else {
+                    updateStatus('themeApiStatus', 'Some methods missing', false);
+                    log('⚠️ Some theme API methods missing', 'warning');
+                }
+                
+                // Test IPC communication
+                try {
+                    const currentTheme = await window.electronAPI.getTheme();
+                    updateStatus('ipcStatus', 'Working', true);
+                    updateCurrentTheme(currentTheme);
+                    log('✅ IPC communication working', 'success');
+                } catch (error) {
+                    updateStatus('ipcStatus', 'Failed', false);
+                    log('❌ IPC communication failed: ' + error.message, 'error');
+                }
+                
+            } else {
+                updateStatus('electronApiStatus', 'Not Available', false);
+                log('❌ ElectronAPI not detected', 'error');
+            }
+            
+            // Check ThemeManager
+            if (window.themeManager) {
+                updateStatus('themeManagerStatus', 'Available', true);
+                log('✅ ThemeManager detected', 'success');
+            } else {
+                updateStatus('themeManagerStatus', 'Not Available', false);
+                log('❌ ThemeManager not detected', 'error');
+            }
+            
+            log('📋 Dashboard initialization complete', 'info');
+        }
+        
+        // Wait for DOM and initialize
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeDashboard);
+        } else {
+            initializeDashboard();
+        }
+    </script>
+</body>
+</html>

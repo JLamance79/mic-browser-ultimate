@@ -156,8 +156,13 @@ class PlatformFeatures {
 
         this.mainWindow.on('ready-to-show', () => {
             try {
-                this.mainWindow.setThumbnailToolbar(thumbnailButtons);
-                console.log('✅ Windows thumbnail toolbar configured');
+                // Thumbnail toolbar is only available on Windows 7+
+                if (process.platform === 'win32' && this.mainWindow.setThumbnailToolbar) {
+                    this.mainWindow.setThumbnailToolbar(thumbnailButtons);
+                    console.log('✅ Windows thumbnail toolbar configured');
+                } else {
+                    console.log('ℹ️ Thumbnail toolbar not available on this platform/version');
+                }
             } catch (error) {
                 console.error('❌ Failed to set thumbnail toolbar:', error);
             }
