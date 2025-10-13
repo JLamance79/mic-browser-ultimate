@@ -122,6 +122,39 @@ jobs:
           echo "Build environment prepared"
         shell: bash
 
+      - name: Debug - Check scripts and create fallback icon
+        run: |
+          echo "Checking package.json scripts..."
+          cat package.json | grep -A5 -B5 "build:ci"
+          echo "Current assets directory:"
+          ls -la assets/ || echo "No assets directory"
+          echo "Testing prepare-icons script..."
+          npm run prepare-icons || echo "prepare-icons failed"
+          echo "Assets after prepare-icons:"
+          ls -la assets/ || echo "Still no assets directory"
+          
+          # Create a fallback icon if none exists
+          mkdir -p assets
+          if [ ! -f "assets/icon.png" ]; then
+            echo "Creating fallback PNG icon..."
+            # Create a simple PNG using ImageMagick if available, or skip
+            if command -v convert >/dev/null 2>&1; then
+              convert -size 256x256 xc:red -fill white -gravity center -pointsize 48 -annotate +0+0 "MIC" assets/icon.png || echo "ImageMagick not available"
+            else
+              echo "No ImageMagick, will try without icon"
+            fi
+          fi
+          
+          # Try to create ICO from PNG if PNG exists
+          if [ -f "assets/icon.png" ] && [ ! -f "assets/icon.ico" ]; then
+            echo "Converting PNG to ICO..."
+            npm run create-icons || echo "ICO conversion failed"
+          fi
+          
+          echo "Final assets check:"
+          ls -la assets/ || echo "No assets created"
+        shell: bash
+
       - name: Build application
         run: npm run build:ci
         env:
