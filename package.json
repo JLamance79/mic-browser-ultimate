@@ -46,7 +46,10 @@
     "automation",
     "llm"
   ],
-  "author": "Your Name",
+  "author": {
+    "name": "MIC Browser Ultimate Team",
+    "email": "team@micbrowser.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "electron": "^38.2.1",
@@ -140,7 +143,7 @@
     ],
     "mac": {
       "category": "public.app-category.productivity",
-      "icon": "assets/icon.icns",
+      "icon": "assets/icon.png",
       "target": [
         {
           "target": "dmg",
