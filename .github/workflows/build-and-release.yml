@@ -24,10 +24,22 @@ jobs:
         with:
           node-version: 18
 
+      - name: Debug - Check repository state
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Repository contents:"
+          ls -la
+          echo "Looking for package-lock.json:"
+          find . -name "package-lock.json" -type f || echo "No package-lock.json found"
+          echo "Git status:"
+          git status --porcelain || echo "No git changes"
+        shell: bash
+
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
             echo "Found package-lock.json, using npm ci"
+            cat package-lock.json | head -5  # Show first few lines to confirm it's valid
             npm ci
           else
             echo "No package-lock.json found, using npm install"
@@ -64,12 +76,24 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libnss3-dev libatk-bridge2.0-dev libdrm2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libgtk-3-dev libxss1
 
+      - name: Debug - Check repository state
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Repository contents:"
+          ls -la
+          echo "Looking for package-lock.json:"
+          find . -name "package-lock.json" -type f || echo "No package-lock.json found"
+          echo "Git status:"
+          git status --porcelain || echo "No git changes"
+        shell: bash
+
       - name: Install dependencies
         run: |
           echo "Checking for package-lock.json..."
           ls -la package-lock.json || echo "package-lock.json not found"
           if [ -f package-lock.json ]; then
             echo "Using npm ci with package-lock.json"
+            cat package-lock.json | head -5  # Show first few lines to confirm it's valid
             npm ci
           else
             echo "Using npm install (no package-lock.json found)"
