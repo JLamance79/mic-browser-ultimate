@@ -38,12 +38,19 @@ jobs:
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
-            echo "Found package-lock.json, using npm ci"
-            cat package-lock.json | head -5  # Show first few lines to confirm it's valid
-            npm ci
+            echo "Found package-lock.json, trying npm ci"
+            echo "File size: $(wc -c < package-lock.json) bytes"
+            echo "First line: $(head -1 package-lock.json)"
+            if npm ci --verbose; then
+              echo "✅ npm ci succeeded"
+            else
+              echo "❌ npm ci failed, falling back to npm install"
+              rm -f package-lock.json
+              npm install --verbose
+            fi
           else
             echo "No package-lock.json found, using npm install"
-            npm install
+            npm install --verbose
           fi
         shell: bash
 
@@ -92,12 +99,19 @@ jobs:
           echo "Checking for package-lock.json..."
           ls -la package-lock.json || echo "package-lock.json not found"
           if [ -f package-lock.json ]; then
-            echo "Using npm ci with package-lock.json"
-            cat package-lock.json | head -5  # Show first few lines to confirm it's valid
-            npm ci
+            echo "Found package-lock.json, trying npm ci"
+            echo "File size: $(wc -c < package-lock.json) bytes"
+            echo "First line: $(head -1 package-lock.json)"
+            if npm ci --verbose; then
+              echo "✅ npm ci succeeded"
+            else
+              echo "❌ npm ci failed, falling back to npm install"
+              rm -f package-lock.json
+              npm install --verbose
+            fi
           else
-            echo "Using npm install (no package-lock.json found)"
-            npm install
+            echo "No package-lock.json found, using npm install"
+            npm install --verbose
           fi
         shell: bash
 
