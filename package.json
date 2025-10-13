@@ -13,7 +13,7 @@
     "prepare-icons": "node scripts/ensure-icons.js",
     "create-icons": "node scripts/create-icon.js && node scripts/create-ico.js",
     "build": "npm run prepare-icons && electron-builder",
-    "build:ci": "npm run prepare-icons && electron-builder --publish=never",
+    "build:ci": "electron-builder --publish=never",
     "build:release": "npm run prepare-icons && electron-builder --publish=always",
     "build:win": "npm run prepare-icons && electron-builder --win",
     "build:mac": "npm run prepare-icons && electron-builder --mac",
