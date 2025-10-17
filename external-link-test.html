@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Link Test Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007acc;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .link-test {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #007acc;
+            border-radius: 5px;
+        }
+        .link-test a {
+            display: inline-block;
+            background: #007acc;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+            transition: background 0.3s;
+        }
+        .link-test a:hover {
+            background: #005a9e;
+        }
+        .description {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.external {
+            background: #e7f3ff;
+            color: #0066cc;
+            border: 1px solid #cce7ff;
+        }
+        .status.internal {
+            background: #f0f9f0;
+            color: #006600;
+            border: 1px solid #ccffcc;
+        }
+        .webview-demo {
+            margin: 20px 0;
+            padding: 20px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            border: 2px solid #b3d9ff;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 External Link Test Demo</h1>
+        
+        <div class="note">
+            <strong>📝 Note:</strong> This demo page shows different types of links. 
+            External links should open in your default browser, while internal links stay in the app.
+        </div>
+
+        <h2>🌐 External Links (Should Open in Browser)</h2>
+        
+        <div class="link-test">
+            <a href="https://github.com" target="_blank">GitHub</a>
+            <span class="status external">EXTERNAL</span>
+            <div class="description">External link with target="_blank"</div>
+        </div>
+
+        <div class="link-test">
+            <a href="https://www.google.com">Google Search</a>
+            <span class="status external">EXTERNAL</span>
+            <div class="description">External link without target attribute</div>
+        </div>
+
+        <div class="link-test">
+            <a href="https://stackoverflow.com/questions">Stack Overflow</a>
+            <span class="status external">EXTERNAL</span>
+            <div class="description">Popular developer site</div>
+        </div>
+
+        <div class="link-test">
+            <a href="https://www.microsoft.com/en-us/microsoft-365">Microsoft 365</a>
+            <span class="status external">EXTERNAL</span>
+            <div class="description">Microsoft official site</div>
+        </div>
+
+        <h2>🏠 Internal Links (Stay in App)</h2>
+
+        <div class="link-test">
+            <a href="#test-section">Scroll to Test Section</a>
+            <span class="status internal">INTERNAL</span>
+            <div class="description">Anchor link within same page</div>
+        </div>
+
+        <div class="link-test">
+            <a href="javascript:alert('Internal JavaScript link')">JavaScript Link</a>
+            <span class="status internal">INTERNAL</span>
+            <div class="description">JavaScript protocol (stays internal)</div>
+        </div>
+
+        <h2>🧪 Dynamic Link Tests</h2>
+
+        <div class="link-test">
+            <button onclick="testDynamicExternal()">Create Dynamic External Link</button>
+            <span class="status external">EXTERNAL</span>
+            <div class="description">JavaScript-generated external link</div>
+        </div>
+
+        <div class="link-test">
+            <button onclick="testWindowOpen()">Test window.open()</button>
+            <span class="status external">EXTERNAL</span>
+            <div class="description">Direct window.open() call</div>
+        </div>
+
+        <div class="webview-demo">
+            <h3>🌐 Webview Integration</h3>
+            <p>When you navigate to external sites within the app's webviews, any external links clicked there will also open in your default browser.</p>
+            <ul>
+                <li>✅ Webview popup blocking</li>
+                <li>✅ External navigation interception</li>
+                <li>✅ Dynamic link injection handling</li>
+                <li>✅ Context isolation preservation</li>
+            </ul>
+        </div>
+
+        <h2 id="test-section">📊 Test Results</h2>
+        
+        <div id="test-results">
+            <p>Click the links above to test external link handling. External links should:</p>
+            <ul>
+                <li>✅ Open in your default browser (Chrome, Firefox, Edge, etc.)</li>
+                <li>✅ Not replace the current app window</li>
+                <li>✅ Show console logs indicating interception</li>
+                <li>✅ Maintain app security and isolation</li>
+            </ul>
+        </div>
+
+        <h2>🔍 Console Monitoring</h2>
+        <p>Open the developer console (F12) to see external link interception logs:</p>
+        <ul>
+            <li><code>Opening external URL: https://...</code></li>
+            <li><code>Intercepted new-window for: https://...</code></li>
+            <li><code>External navigation blocked, opening in browser: https://...</code></li>
+            <li><code>Opening external link: https://...</code></li>
+        </ul>
+    </div>
+
+    <script>
+        function testDynamicExternal() {
+            // Create a dynamic external link
+            const link = document.createElement('a');
+            link.href = 'https://www.npmjs.com';
+            link.textContent = 'NPM Registry (Dynamic)';
+            link.target = '_blank';
+            
+            // Temporarily add to document to trigger click
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log('Dynamic external link created and clicked');
+        }
+
+        function testWindowOpen() {
+            // Test direct window.open() call
+            window.open('https://nodejs.org', '_blank');
+            console.log('window.open() called for Node.js site');
+        }
+
+        // Log when external link handler is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('External link test demo loaded');
+            if (window.electronAPI && window.electronAPI.openExternalLink) {
+                console.log('✅ electronAPI.openExternalLink is available');
+            } else {
+                console.log('⚠️ electronAPI.openExternalLink not available (normal in browser)');
+            }
+        });
+    </script>
+</body>
+</html>

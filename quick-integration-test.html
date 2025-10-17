@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 MIC Browser Ultimate - Integration Test</h1>
+    
+    <div class="test-container">
+        <h2>🔄 Auto-Updater System</h2>
+        <div id="autoUpdaterResults"></div>
+        <button onclick="testAutoUpdater()">Test Auto-Updater</button>
+    </div>
+
+    <div class="test-container">
+        <h2>📊 Crash Reporting System</h2>
+        <div id="crashReportingResults"></div>
+        <button onclick="testCrashReporting()">Test Crash Reporting</button>
+    </div>
+
+    <div class="test-container">
+        <h2>🔔 Native Notifications</h2>
+        <div id="notificationResults"></div>
+        <button onclick="testNotifications()">Test Notifications</button>
+    </div>
+
+    <div class="test-container">
+        <h2>🔗 System Integration</h2>
+        <div id="integrationResults"></div>
+        <button onclick="testIntegration()">Test Integration</button>
+    </div>
+
+    <script>
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            container.appendChild(div);
+        }
+
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        async function testAutoUpdater() {
+            clearResults('autoUpdaterResults');
+            addResult('autoUpdaterResults', '🔍 Testing Auto-Updater API availability...', 'info');
+            
+            try {
+                // Test API availability
+                if (window.electronAPI && window.electronAPI.autoUpdater) {
+                    addResult('autoUpdaterResults', '✅ Auto-Updater API is available', 'success');
+                    
+                    // Test status check
+                    addResult('autoUpdaterResults', '🔍 Checking updater status...', 'info');
+                    const status = await window.electronAPI.autoUpdater.getStatus();
+                    addResult('autoUpdaterResults', `✅ Status: ${JSON.stringify(status)}`, 'success');
+                    
+                    // Test settings
+                    addResult('autoUpdaterResults', '🔍 Getting updater settings...', 'info');
+                    const settings = await window.electronAPI.autoUpdater.getSettings();
+                    addResult('autoUpdaterResults', `✅ Settings: ${JSON.stringify(settings)}`, 'success');
+                    
+                } else {
+                    addResult('autoUpdaterResults', '❌ Auto-Updater API not available', 'error');
+                }
+            } catch (error) {
+                addResult('autoUpdaterResults', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCrashReporting() {
+            clearResults('crashReportingResults');
+            addResult('crashReportingResults', '🔍 Testing Crash Reporting API availability...', 'info');
+            
+            try {
+                if (window.electronAPI && window.electronAPI.crashReporting) {
+                    addResult('crashReportingResults', '✅ Crash Reporting API is available', 'success');
+                    
+                    // Test settings
+                    addResult('crashReportingResults', '🔍 Getting crash reporting settings...', 'info');
+                    const settings = await window.electronAPI.crashReporting.getSettings();
+                    addResult('crashReportingResults', `✅ Settings: ${JSON.stringify(settings)}`, 'success');
+                    
+                    // Test reports
+                    addResult('crashReportingResults', '🔍 Getting crash reports...', 'info');
+                    const reports = await window.electronAPI.crashReporting.getReports();
+                    addResult('crashReportingResults', `✅ Reports count: ${reports.length}`, 'success');
+                    
+                } else {
+                    addResult('crashReportingResults', '❌ Crash Reporting API not available', 'error');
+                }
+            } catch (error) {
+                addResult('crashReportingResults', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testNotifications() {
+            clearResults('notificationResults');
+            addResult('notificationResults', '🔍 Testing Notification API availability...', 'info');
+            
+            try {
+                if (window.electronAPI && window.electronAPI.notifications) {
+                    addResult('notificationResults', '✅ Notifications API is available', 'success');
+                    
+                    // Test settings
+                    addResult('notificationResults', '🔍 Getting notification settings...', 'info');
+                    const settings = await window.electronAPI.notifications.getSettings();
+                    addResult('notificationResults', `✅ Settings: ${JSON.stringify(settings)}`, 'success');
+                    
+                    // Test supported check
+                    addResult('notificationResults', '🔍 Checking notification support...', 'info');
+                    const supported = await window.electronAPI.notifications.isSupported();
+                    addResult('notificationResults', `✅ Supported: ${supported}`, 'success');
+                    
+                    // Test notification
+                    addResult('notificationResults', '🔍 Sending test notification...', 'info');
+                    await window.electronAPI.notifications.show({
+                        title: 'Integration Test',
+                        body: 'This is a test notification from the integration test',
+                        category: 'test'
+                    });
+                    addResult('notificationResults', '✅ Test notification sent successfully', 'success');
+                    
+                } else {
+                    addResult('notificationResults', '❌ Notifications API not available', 'error');
+                }
+            } catch (error) {
+                addResult('notificationResults', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testIntegration() {
+            clearResults('integrationResults');
+            addResult('integrationResults', '🔍 Testing overall system integration...', 'info');
+            
+            // Check main API availability
+            if (window.electronAPI) {
+                addResult('integrationResults', '✅ Main electronAPI bridge is available', 'success');
+                
+                const apis = ['autoUpdater', 'crashReporting', 'notifications'];
+                let availableApis = 0;
+                
+                apis.forEach(api => {
+                    if (window.electronAPI[api]) {
+                        addResult('integrationResults', `✅ ${api} API is available`, 'success');
+                        availableApis++;
+                    } else {
+                        addResult('integrationResults', `❌ ${api} API is not available`, 'error');
+                    }
+                });
+                
+                addResult('integrationResults', `📊 API Availability: ${availableApis}/${apis.length} (${Math.round(availableApis/apis.length*100)}%)`, 
+                    availableApis === apis.length ? 'success' : 'info');
+                
+                // Test preload security
+                if (window.nodeAPI) {
+                    addResult('integrationResults', '✅ Node API bridge is available', 'success');
+                } else {
+                    addResult('integrationResults', '❌ Node API bridge not available', 'error');
+                }
+                
+                // Test development mode detection
+                if (window.isDev !== undefined) {
+                    addResult('integrationResults', `✅ Development mode: ${window.isDev}`, 'success');
+                } else {
+                    addResult('integrationResults', '❌ Development mode detection not available', 'error');
+                }
+                
+            } else {
+                addResult('integrationResults', '❌ Main electronAPI bridge is not available', 'error');
+            }
+        }
+
+        // Auto-run integration test on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                testIntegration();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

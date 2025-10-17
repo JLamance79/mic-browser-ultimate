@@ -9,10 +9,16 @@ const { PreferenceEngine, PredictionModel, AdaptationEngine } = require('./Learn
 const { LightweightMLModels } = require('./LightweightML');
 
 class LearningEngine extends EventEmitter {
-  constructor(storage, aiSystem) {
+  constructor(storage, aiSystem, options = {}) {
     super();
-    this.storage = storage;
+    this.storage = storage || {
+      getSetting: async (key) => null,
+      setSetting: async (key, value) => true
+    };
     this.aiSystem = aiSystem;
+    
+    // Test mode prevents background processes that would cause hanging in tests
+    this.testMode = options.testMode || false;
     
     // Learning modules
     this.behaviorTracker = new BehaviorTracker(this);
@@ -54,6 +60,10 @@ class LearningEngine extends EventEmitter {
       lastUpdated: Date.now()
     };
     
+    // Track background processes for cleanup
+    this.intervals = [];
+    this.backgroundProcesses = [];
+    
     this.initialized = false;
   }
   
@@ -74,11 +84,15 @@ class LearningEngine extends EventEmitter {
       await this.adaptationEngine.initialize();
       await this.mlModels.initialize();
       
-      // Setup learning workflows
-      this.setupLearningWorkflows();
-      
-      // Start background learning processes
-      this.startBackgroundLearning();
+      // Setup learning workflows (skip in test mode to prevent hanging)
+      if (!this.testMode) {
+        this.setupLearningWorkflows();
+        
+        // Start background learning processes
+        this.startBackgroundLearning();
+      } else {
+        console.log('⚠️ Test mode: Skipping background processes to prevent hanging');
+      }
       
       this.initialized = true;
       console.log('✅ Learning Engine initialized successfully');
@@ -124,9 +138,14 @@ class LearningEngine extends EventEmitter {
   }
   
   standardizeInteraction(interaction) {
+    // Ensure sessionId exists
+    const sessionId = interaction.sessionId || interaction.metadata?.sessionId || this.generateSessionId();
+    
     return {
+      ...interaction, // Preserve all original properties
       id: interaction.id || this.generateInteractionId(),
       timestamp: interaction.timestamp || Date.now(),
+      sessionId: sessionId, // Ensure this is always present
       user: interaction.user || 'anonymous',
       component: interaction.component || 'unknown',
       action: interaction.action || 'unknown',
@@ -135,10 +154,15 @@ class LearningEngine extends EventEmitter {
       outcome: interaction.outcome || 'pending',
       duration: interaction.duration || 0,
       satisfaction: interaction.satisfaction || null,
+      features: interaction.features || [],
+      userAgent: interaction.userAgent || navigator?.userAgent || 'unknown',
       metadata: {
-        userAgent: interaction.userAgent,
-        sessionId: interaction.sessionId,
+        sessionId: sessionId,
+        userAgent: interaction.userAgent || navigator?.userAgent || 'unknown',
         features: interaction.features || [],
+        timestamp: interaction.timestamp || Date.now(),
+        component: interaction.component || 'unknown',
+        action: interaction.action || 'unknown',
         ...interaction.metadata
       }
     };
@@ -175,17 +199,29 @@ class LearningEngine extends EventEmitter {
     try {
       console.log('🔍 Learning patterns from user behavior...');
       
+      // Get the latest interaction history from behaviorTracker
+      const interactionHistory = this.behaviorTracker.getInteractionHistory();
+      
+      // Combine with stored behavior history
+      const allInteractions = [...this.behaviorHistory, ...interactionHistory];
+      
+      // Ensure we have enough interactions to learn patterns
+      if (allInteractions.length < 3) {
+        console.log('Insufficient interaction data for pattern learning');
+        return;
+      }
+      
       // Sequence patterns
-      const sequencePatterns = await this.patternRecognizer.findSequencePatterns(this.behaviorHistory);
+      const sequencePatterns = await this.patternRecognizer.findSequencePatterns(allInteractions);
       
       // Temporal patterns
-      const temporalPatterns = await this.patternRecognizer.findTemporalPatterns(this.behaviorHistory);
+      const temporalPatterns = await this.patternRecognizer.findTemporalPatterns(allInteractions);
       
       // Context patterns
-      const contextPatterns = await this.patternRecognizer.findContextPatterns(this.behaviorHistory);
+      const contextPatterns = await this.patternRecognizer.findContextPatterns(allInteractions);
       
       // Usage patterns
-      const usagePatterns = await this.patternRecognizer.findUsagePatterns(this.behaviorHistory);
+      const usagePatterns = await this.patternRecognizer.findUsagePatterns(allInteractions);
       
       // Store learned patterns
       this.storePatterns({
@@ -699,16 +735,20 @@ class LearningEngine extends EventEmitter {
   
   setupLearningWorkflows() {
     // Pattern learning every 5 minutes
-    setInterval(() => this.learnPatterns(), 5 * 60 * 1000);
+    const patternInterval = setInterval(() => this.learnPatterns(), 5 * 60 * 1000);
+    this.intervals.push(patternInterval);
     
     // Preference learning every 10 minutes
-    setInterval(() => this.learnPreferences(), 10 * 60 * 1000);
+    const preferenceInterval = setInterval(() => this.learnPreferences(), 10 * 60 * 1000);
+    this.intervals.push(preferenceInterval);
     
     // Save learning data every 15 minutes
-    setInterval(() => this.saveLearningData(), 15 * 60 * 1000);
+    const saveInterval = setInterval(() => this.saveLearningData(), 15 * 60 * 1000);
+    this.intervals.push(saveInterval);
     
     // Clean old data every hour
-    setInterval(() => this.cleanOldData(), 60 * 60 * 1000);
+    const cleanInterval = setInterval(() => this.cleanOldData(), 60 * 60 * 1000);
+    this.intervals.push(cleanInterval);
   }
   
   startBackgroundLearning() {
@@ -724,6 +764,10 @@ class LearningEngine extends EventEmitter {
   
   generateInteractionId() {
     return `int_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+  
+  generateSessionId() {
+    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
   
   generateUserId() {
@@ -761,7 +805,12 @@ class LearningEngine extends EventEmitter {
   }
 
   async getRecognizedPatterns() {
-    return this.patternRecognizer.getPatterns();
+    // Convert the stored patterns from the learningEngine
+    const patterns = [];
+    for (const [key, pattern] of this.learnedPatterns) {
+      patterns.push(pattern);
+    }
+    return patterns;
   }
 
   // Privacy and control methods
@@ -936,6 +985,10 @@ class LearningEngine extends EventEmitter {
   
   async shutdown() {
     console.log('🛑 Shutting down Learning Engine...');
+    
+    // Clear all intervals to prevent hanging
+    this.intervals.forEach(interval => clearInterval(interval));
+    this.intervals = [];
     
     // Save all data
     await this.saveLearningData();

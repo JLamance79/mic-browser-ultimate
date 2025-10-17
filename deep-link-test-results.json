@@ -1,0 +1,243 @@
+{
+  "summary": {
+    "total": 31,
+    "passed": 31,
+    "failed": 0,
+    "successRate": 100
+  },
+  "categories": {
+    "DeepLinkManager Import": {
+      "pass": 1,
+      "fail": 0
+    },
+    "Deep Link Demo": {
+      "pass": 1,
+      "fail": 0
+    },
+    "Demo Completion": {
+      "pass": 1,
+      "fail": 0
+    },
+    "Security Validation": {
+      "pass": 1,
+      "fail": 0
+    },
+    "URL Processing": {
+      "pass": 1,
+      "fail": 0
+    },
+    "URL Generation": {
+      "pass": 3,
+      "fail": 0
+    },
+    "Security Test": {
+      "pass": 4,
+      "fail": 0
+    },
+    "File Check": {
+      "pass": 5,
+      "fail": 0
+    },
+    "Integration": {
+      "pass": 4,
+      "fail": 0
+    },
+    "API Exposure": {
+      "pass": 5,
+      "fail": 0
+    },
+    "UI Integration": {
+      "pass": 5,
+      "fail": 0
+    }
+  },
+  "results": [
+    {
+      "test": "DeepLinkManager Import",
+      "passed": true,
+      "message": "Successfully imported DeepLinkManager",
+      "timestamp": "2025-10-16T18:33:54.910Z"
+    },
+    {
+      "test": "Deep Link Demo",
+      "passed": true,
+      "message": "Demonstration completed successfully",
+      "timestamp": "2025-10-16T18:33:54.970Z"
+    },
+    {
+      "test": "Demo Completion",
+      "passed": true,
+      "message": "Demo completed with success message",
+      "timestamp": "2025-10-16T18:33:54.971Z"
+    },
+    {
+      "test": "Security Validation",
+      "passed": true,
+      "message": "Security validation working",
+      "timestamp": "2025-10-16T18:33:54.971Z"
+    },
+    {
+      "test": "URL Processing",
+      "passed": true,
+      "message": "URL processing functional",
+      "timestamp": "2025-10-16T18:33:54.971Z"
+    },
+    {
+      "test": "URL Generation: search",
+      "passed": true,
+      "message": "Generated and parsed correctly",
+      "timestamp": "2025-10-16T18:33:54.972Z"
+    },
+    {
+      "test": "URL Generation: chat",
+      "passed": true,
+      "message": "Generated and parsed correctly",
+      "timestamp": "2025-10-16T18:33:54.973Z"
+    },
+    {
+      "test": "URL Generation: settings",
+      "passed": true,
+      "message": "Generated and parsed correctly",
+      "timestamp": "2025-10-16T18:33:54.973Z"
+    },
+    {
+      "test": "Security Test: Allow",
+      "passed": true,
+      "message": "Correctly allowed URL",
+      "timestamp": "2025-10-16T18:33:54.973Z"
+    },
+    {
+      "test": "Security Test: Block",
+      "passed": true,
+      "message": "Correctly blocked URL",
+      "timestamp": "2025-10-16T18:33:54.973Z"
+    },
+    {
+      "test": "Security Test: Block",
+      "passed": true,
+      "message": "Correctly blocked URL",
+      "timestamp": "2025-10-16T18:33:54.974Z"
+    },
+    {
+      "test": "Security Test: Block",
+      "passed": true,
+      "message": "Correctly blocked URL",
+      "timestamp": "2025-10-16T18:33:54.974Z"
+    },
+    {
+      "test": "File Check: DeepLinkManager.js",
+      "passed": true,
+      "message": "File exists",
+      "timestamp": "2025-10-16T18:33:54.974Z"
+    },
+    {
+      "test": "File Check: deep-link-demo.js",
+      "passed": true,
+      "message": "File exists",
+      "timestamp": "2025-10-16T18:33:54.974Z"
+    },
+    {
+      "test": "File Check: deep-link-test.js",
+      "passed": true,
+      "message": "File exists",
+      "timestamp": "2025-10-16T18:33:54.974Z"
+    },
+    {
+      "test": "File Check: DEEP_LINK_COMPLETE.md",
+      "passed": true,
+      "message": "File exists",
+      "timestamp": "2025-10-16T18:33:54.975Z"
+    },
+    {
+      "test": "File Check: DEEP_LINK_IMPLEMENTATION_SUMMARY.md",
+      "passed": true,
+      "message": "File exists",
+      "timestamp": "2025-10-16T18:33:54.975Z"
+    },
+    {
+      "test": "Integration: DeepLinkManager import",
+      "passed": true,
+      "message": "Found in main.js",
+      "timestamp": "2025-10-16T18:33:54.975Z"
+    },
+    {
+      "test": "Integration: Deep link initialization",
+      "passed": true,
+      "message": "Found in main.js",
+      "timestamp": "2025-10-16T18:33:54.975Z"
+    },
+    {
+      "test": "Integration: IPC handlers setup",
+      "passed": true,
+      "message": "Found in main.js",
+      "timestamp": "2025-10-16T18:33:54.975Z"
+    },
+    {
+      "test": "Integration: Protocol registration",
+      "passed": true,
+      "message": "Found in main.js",
+      "timestamp": "2025-10-16T18:33:54.975Z"
+    },
+    {
+      "test": "API Exposure: handle: (url)",
+      "passed": true,
+      "message": "Found in preload.js",
+      "timestamp": "2025-10-16T18:33:54.976Z"
+    },
+    {
+      "test": "API Exposure: generate: (action, params",
+      "passed": true,
+      "message": "Found in preload.js",
+      "timestamp": "2025-10-16T18:33:54.976Z"
+    },
+    {
+      "test": "API Exposure: getSettings: ()",
+      "passed": true,
+      "message": "Found in preload.js",
+      "timestamp": "2025-10-16T18:33:54.976Z"
+    },
+    {
+      "test": "API Exposure: getStatistics: ()",
+      "passed": true,
+      "message": "Found in preload.js",
+      "timestamp": "2025-10-16T18:33:54.976Z"
+    },
+    {
+      "test": "API Exposure: getHistory: ()",
+      "passed": true,
+      "message": "Found in preload.js",
+      "timestamp": "2025-10-16T18:33:54.976Z"
+    },
+    {
+      "test": "UI Integration: Deep Link Protocol",
+      "passed": true,
+      "message": "Found in index.html",
+      "timestamp": "2025-10-16T18:33:54.978Z"
+    },
+    {
+      "test": "UI Integration: deeplink-settings",
+      "passed": true,
+      "message": "Found in index.html",
+      "timestamp": "2025-10-16T18:33:54.978Z"
+    },
+    {
+      "test": "UI Integration: testDeepLink",
+      "passed": true,
+      "message": "Found in index.html",
+      "timestamp": "2025-10-16T18:33:54.979Z"
+    },
+    {
+      "test": "UI Integration: generateDeepLink",
+      "passed": true,
+      "message": "Found in index.html",
+      "timestamp": "2025-10-16T18:33:54.979Z"
+    },
+    {
+      "test": "UI Integration: deeplinkTestUrl",
+      "passed": true,
+      "message": "Found in index.html",
+      "timestamp": "2025-10-16T18:33:54.979Z"
+    }
+  ],
+  "timestamp": "2025-10-16T18:33:54.981Z"
+}

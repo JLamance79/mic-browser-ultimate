@@ -1,0 +1,21 @@
+{
+  "patterns": {
+    "commonSequences": {},
+    "userPatterns": {},
+    "optimizationSuggestions": [],
+    "learningRate": 0.1,
+    "minConfidence": 0.7,
+    "maxPatterns": 1000
+  },
+  "settings": {
+    "captureClicks": true,
+    "captureTyping": true,
+    "captureNavigation": true,
+    "captureScrolling": false,
+    "captureHovers": false,
+    "ignoreSystem": true,
+    "smartGrouping": true,
+    "autoOptimize": true
+  },
+  "timestamp": 1760645868367
+}

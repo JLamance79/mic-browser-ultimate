@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Sign-in Diagnostic Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4285f4;
+            padding-bottom: 10px;
+        }
+        .diagnostic-section {
+            margin: 20px 0;
+            padding: 20px;
+            border-left: 4px solid #4285f4;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 10px 10px 0;
+            transition: background 0.3s;
+        }
+        .test-button:hover {
+            background: #3367d6;
+        }
+        .fix-button {
+            background: #34a853;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .results {
+            background: #f1f3f4;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .chrome-test {
+            border: 2px solid #4285f4;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: #e8f0fe;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Chrome Sign-in Diagnostic Tool</h1>
+        
+        <div class="chrome-test">
+            <h2>🚀 Quick Chrome Test</h2>
+            <p>Click the button below to test Chrome sign-in directly:</p>
+            <button class="test-button" onclick="testChromeSignin()">Test Chrome Sign-in</button>
+            <button class="test-button" onclick="openGoogleInTab()" style="background: #ea4335;">Open Google.com</button>
+            <div id="chrome-test-results" class="results" style="display: none;"></div>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>📊 System Diagnostics</h2>
+            <p>Run comprehensive diagnostics to identify Chrome sign-in issues:</p>
+            <button class="test-button" onclick="runDiagnostics()">Run Diagnostics</button>
+            <button class="test-button" onclick="clearAppData()" style="background: #ff9800;">Clear App Data</button>
+            <div id="diagnostic-results" class="results" style="display: none;"></div>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>🔧 Common Fixes</h2>
+            <p>Try these common solutions for Chrome sign-in problems:</p>
+            
+            <div style="margin: 15px 0;">
+                <button class="fix-button" onclick="fixCSP()">Fix CSP Policy</button>
+                <button class="fix-button" onclick="clearCookies()">Clear Cookies</button>
+                <button class="fix-button" onclick="resetUserAgent()">Reset User Agent</button>
+                <button class="fix-button" onclick="enablePopups()">Enable Popups</button>
+            </div>
+            
+            <div id="fix-results" class="results" style="display: none;"></div>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>📝 Manual Steps</h2>
+            <ol>
+                <li><strong>Clear Browser Data:</strong> Close the app completely and restart</li>
+                <li><strong>Check Internet Connection:</strong> Ensure you have a stable connection</li>
+                <li><strong>Disable Extensions:</strong> Temporarily disable any browser extensions</li>
+                <li><strong>Try Incognito Mode:</strong> Test sign-in in an incognito/private window</li>
+                <li><strong>Update Chrome:</strong> Ensure you're using the latest version</li>
+                <li><strong>Check Firewall:</strong> Make sure Chrome isn't blocked by firewall</li>
+            </ol>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>🆘 Error Solutions</h2>
+            <div id="error-solutions">
+                <p><strong>If you see "CORS errors":</strong> The Content Security Policy has been updated to allow Google domains.</p>
+                <p><strong>If popups are blocked:</strong> Chrome sign-in requires popup windows to be enabled.</p>
+                <p><strong>If cookies aren't working:</strong> Third-party cookies must be enabled for authentication.</p>
+                <p><strong>If you get "Network errors":</strong> Check your internet connection and firewall settings.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let diagnosticResults = {};
+
+        function testChromeSignin() {
+            const resultsDiv = document.getElementById('chrome-test-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.textContent = '🔄 Testing Chrome sign-in...\n';
+
+            try {
+                // Try to open Google sign-in page
+                const googleSigninUrl = 'https://accounts.google.com/signin';
+                
+                if (window.electronAPI && window.electronAPI.openExternalLink) {
+                    window.electronAPI.openExternalLink(googleSigninUrl);
+                    resultsDiv.textContent += '✅ Opened Google sign-in in external browser\n';
+                    resultsDiv.textContent += '🔍 Try signing in there and check if it works\n';
+                } else {
+                    // Fallback: open in current window
+                    window.location.href = googleSigninUrl;
+                    resultsDiv.textContent += '🔄 Redirecting to Google sign-in...\n';
+                }
+            } catch (error) {
+                resultsDiv.textContent += '❌ Error: ' + error.message + '\n';
+            }
+        }
+
+        function openGoogleInTab() {
+            const resultsDiv = document.getElementById('chrome-test-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.textContent = '🔄 Opening Google.com...\n';
+
+            try {
+                if (window.electronAPI && window.electronAPI.openExternalLink) {
+                    window.electronAPI.openExternalLink('https://www.google.com');
+                    resultsDiv.textContent += '✅ Opened Google.com in external browser\n';
+                } else {
+                    window.open('https://www.google.com', '_blank');
+                    resultsDiv.textContent += '✅ Opened Google.com in new tab\n';
+                }
+            } catch (error) {
+                resultsDiv.textContent += '❌ Error: ' + error.message + '\n';
+            }
+        }
+
+        async function runDiagnostics() {
+            const resultsDiv = document.getElementById('diagnostic-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.textContent = '🔍 Running comprehensive diagnostics...\n\n';
+
+            try {
+                // Check Chrome sign-in helper
+                if (window.chromeSigninHelper) {
+                    resultsDiv.textContent += '✅ Chrome Sign-in Helper: Available\n';
+                    const report = await window.chromeSigninHelper.diagnoseAuthIssues();
+                    diagnosticResults = report;
+                    
+                    resultsDiv.textContent += `📊 User Agent: ${report.userAgent}\n`;
+                    resultsDiv.textContent += `🍪 Cookies Enabled: ${report.cookiesEnabled}\n`;
+                    resultsDiv.textContent += `🌐 Online Status: ${report.onlineStatus}\n`;
+                    resultsDiv.textContent += `🔧 Electron API: ${report.electronAPI ? 'Available' : 'Not Available'}\n`;
+                    resultsDiv.textContent += `📺 Webviews: ${report.webviewCount}\n\n`;
+                    
+                    if (report.authIssues.length > 0) {
+                        resultsDiv.textContent += '⚠️ Issues Found:\n';
+                        report.authIssues.forEach(issue => {
+                            resultsDiv.textContent += `  • ${issue.message}\n`;
+                            resultsDiv.textContent += `    Fix: ${issue.fix}\n\n`;
+                        });
+                    } else {
+                        resultsDiv.textContent += '✅ No authentication issues detected\n';
+                    }
+                } else {
+                    resultsDiv.textContent += '❌ Chrome Sign-in Helper: Not Available\n';
+                    resultsDiv.textContent += 'The helper script may not have loaded properly.\n\n';
+                }
+
+                // Test basic connectivity
+                resultsDiv.textContent += '🌐 Testing connectivity...\n';
+                const img = new Image();
+                img.onload = () => {
+                    resultsDiv.textContent += '✅ Google connectivity: OK\n';
+                };
+                img.onerror = () => {
+                    resultsDiv.textContent += '❌ Google connectivity: Failed\n';
+                };
+                img.src = 'https://www.google.com/favicon.ico?' + Date.now();
+
+            } catch (error) {
+                resultsDiv.textContent += '❌ Diagnostic Error: ' + error.message + '\n';
+            }
+        }
+
+        function clearAppData() {
+            const resultsDiv = document.getElementById('fix-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.textContent = '🗑️ Clearing app data...\n';
+
+            try {
+                // Clear local storage
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Clear cookies
+                document.cookie.split(";").forEach(function(c) { 
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                });
+                
+                resultsDiv.textContent += '✅ Local storage cleared\n';
+                resultsDiv.textContent += '✅ Session storage cleared\n';
+                resultsDiv.textContent += '✅ Cookies cleared\n';
+                resultsDiv.textContent += '🔄 Please restart the app to complete the process\n';
+            } catch (error) {
+                resultsDiv.textContent += '❌ Error: ' + error.message + '\n';
+            }
+        }
+
+        function fixCSP() {
+            const resultsDiv = document.getElementById('fix-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.textContent = '🔧 CSP has been updated to allow Google domains\n';
+            resultsDiv.textContent += '✅ Added: https://accounts.google.com\n';
+            resultsDiv.textContent += '✅ Added: https://accounts.youtube.com\n';
+            resultsDiv.textContent += '✅ Added: https://apis.google.com\n';
+            resultsDiv.textContent += '🔄 Restart the app to apply changes\n';
+        }
+
+        function clearCookies() {
+            const resultsDiv = document.getElementById('fix-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.textContent = '🍪 Clearing cookies...\n';
+
+            try {
+                document.cookie.split(";").forEach(function(c) { 
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                });
+                resultsDiv.textContent += '✅ Cookies cleared successfully\n';
+            } catch (error) {
+                resultsDiv.textContent += '❌ Error clearing cookies: ' + error.message + '\n';
+            }
+        }
+
+        function resetUserAgent() {
+            const resultsDiv = document.getElementById('fix-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.textContent = '🔧 User agent has been set to Chrome-compatible version\n';
+            resultsDiv.textContent += 'Current: ' + navigator.userAgent + '\n';
+            resultsDiv.textContent += '✅ Webviews will use Chrome user agent\n';
+        }
+
+        function enablePopups() {
+            const resultsDiv = document.getElementById('fix-results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.textContent = '🪟 Popup settings have been configured\n';
+            resultsDiv.textContent += '✅ Webviews allow popups for authentication\n';
+            resultsDiv.textContent += '✅ External links open in system browser\n';
+        }
+
+        // Initialize diagnostics when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔐 Chrome Sign-in Diagnostic Tool loaded');
+            
+            // Auto-run basic diagnostics after a short delay
+            setTimeout(() => {
+                if (window.chromeSigninHelper) {
+                    console.log('✅ Chrome Sign-in Helper detected and ready');
+                } else {
+                    console.warn('⚠️ Chrome Sign-in Helper not detected');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

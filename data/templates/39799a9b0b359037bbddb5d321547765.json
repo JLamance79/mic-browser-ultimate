@@ -1,0 +1,62 @@
+{
+  "id": "39799a9b0b359037bbddb5d321547765",
+  "name": "Login Template",
+  "description": "Template generated from Login Workflow",
+  "baseWorkflowId": "template-base-workflow",
+  "variables": [
+    {
+      "name": "BASE_URL",
+      "type": "url",
+      "required": true,
+      "description": "Variable for BASE_URL"
+    },
+    {
+      "name": "USERNAME",
+      "type": "text",
+      "required": true,
+      "description": "Variable for USERNAME"
+    },
+    {
+      "name": "PASSWORD",
+      "type": "text",
+      "required": true,
+      "description": "Variable for PASSWORD"
+    }
+  ],
+  "steps": [
+    {
+      "type": "navigation",
+      "action": "navigate",
+      "target": "{{BASE_URL}}/login",
+      "data": {
+        "url": "{{BASE_URL}}{{BASE_URL}}/login"
+      }
+    },
+    {
+      "type": "input",
+      "action": "type",
+      "target": "#username",
+      "data": {
+        "value": "{{INPUT_VALUE}}"
+      }
+    },
+    {
+      "type": "input",
+      "action": "type",
+      "target": "#password",
+      "data": {
+        "value": "{{INPUT_VALUE}}"
+      }
+    },
+    {
+      "type": "click",
+      "action": "click",
+      "target": "#login-submit"
+    }
+  ],
+  "metadata": {
+    "created": 1760645868137,
+    "usage": 0,
+    "rating": 0
+  }
+}

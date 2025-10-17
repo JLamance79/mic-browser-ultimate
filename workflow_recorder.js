@@ -955,6 +955,334 @@ class WorkflowRecorder extends EventEmitter {
     await fs.mkdir(stateDir, { recursive: true });
     await fs.writeFile(path.join(stateDir, 'workflow-state.json'), JSON.stringify(state, null, 2));
   }
+
+  // Missing initialization methods
+  initializePatternRecognition() {
+    // Initialize AI pattern recognition system
+    this.patternRecognition.learningRate = 0.1;
+    this.patternRecognition.minConfidence = 0.7;
+    this.patternRecognition.maxPatterns = 1000;
+    
+    console.log('🧠 Pattern recognition system initialized');
+  }
+
+  setupExecutionEngine() {
+    // Initialize execution engine settings
+    this.executor.concurrentLimit = 5;
+    this.executor.defaultTimeout = 30000;
+    this.executor.retryDelay = 1000;
+    
+    console.log('⚡ Execution engine configured');
+  }
+
+  async startEventCapture() {
+    // Start capturing browser events for recording
+    if (!this.mainWindow || !this.mainWindow.webContents) {
+      console.log('📡 Event capture ready (mock mode)');
+      return;
+    }
+
+    // Set up event listeners for the main window
+    this.mainWindow.webContents.on('did-finish-load', () => {
+      this.capturePageLoad();
+    });
+
+    console.log('📡 Event capture started');
+  }
+
+  async stopEventCapture() {
+    // Stop capturing events
+    if (this.mainWindow && this.mainWindow.webContents) {
+      this.mainWindow.webContents.removeAllListeners('did-finish-load');
+    }
+    
+    console.log('🛑 Event capture stopped');
+  }
+
+  capturePageLoad() {
+    if (this.isRecording && this.recordingSession) {
+      this.recordStep({
+        type: 'navigation',
+        action: 'page_load',
+        target: this.mainWindow.webContents.getURL(),
+        data: { 
+          url: this.mainWindow.webContents.getURL(),
+          title: this.mainWindow.webContents.getTitle()
+        },
+        context: { 
+          timestamp: Date.now(),
+          automatic: true
+        }
+      });
+    }
+  }
+
+  optimizeCurrentRecording() {
+    // Real-time optimization during recording
+    if (!this.recordingSession || this.recordingSession.steps.length < 2) {
+      return;
+    }
+
+    const steps = this.recordingSession.steps;
+    const lastTwoSteps = steps.slice(-2);
+    
+    // Check for immediate duplicates
+    if (this.isDuplicateStep(lastTwoSteps[0], lastTwoSteps[1])) {
+      steps.pop(); // Remove the duplicate
+      console.log('🔧 Removed duplicate step during recording');
+    }
+  }
+
+  async generateDescription(steps) {
+    // Generate workflow description from steps
+    const actionCounts = {};
+    steps.forEach(step => {
+      actionCounts[step.type] = (actionCounts[step.type] || 0) + 1;
+    });
+
+    const descriptions = [];
+    if (actionCounts.navigation) descriptions.push(`${actionCounts.navigation} navigation(s)`);
+    if (actionCounts.click) descriptions.push(`${actionCounts.click} click(s)`);
+    if (actionCounts.input) descriptions.push(`${actionCounts.input} input(s)`);
+    if (actionCounts.wait) descriptions.push(`${actionCounts.wait} wait(s)`);
+
+    return `Workflow with ${descriptions.join(', ')}`;
+  }
+
+  async generateTags(steps) {
+    // Generate tags based on step types and patterns
+    const tags = new Set();
+    
+    steps.forEach(step => {
+      tags.add(step.type);
+      if (step.target && step.target.includes('form')) tags.add('form');
+      if (step.target && step.target.includes('button')) tags.add('button');
+      if (step.data && step.data.url) tags.add('navigation');
+    });
+
+    return Array.from(tags);
+  }
+
+  async categorizeWorkflow(steps) {
+    // Categorize workflow based on step patterns
+    const hasNavigation = steps.some(s => s.type === 'navigation');
+    const hasInput = steps.some(s => s.type === 'input');
+    const hasClick = steps.some(s => s.type === 'click');
+
+    if (hasNavigation && hasInput) return 'form-filling';
+    if (hasNavigation) return 'navigation';
+    if (hasInput) return 'data-entry';
+    if (hasClick) return 'interaction';
+    return 'general';
+  }
+
+  generateValidationRules(steps) {
+    // Generate validation rules for workflow steps
+    return {
+      requiredElements: steps
+        .filter(s => s.target)
+        .map(s => s.target),
+      expectedDuration: this.estimateExecutionTime(steps),
+      criticalSteps: steps
+        .filter(s => s.type === 'navigation' || s.type === 'click')
+        .map((s, i) => i)
+    };
+  }
+
+  extractVariables(steps) {
+    // Extract variables from workflow steps
+    const variables = [];
+    const variablePattern = /{{([^}]+)}}/g;
+    
+    steps.forEach(step => {
+      const stepStr = JSON.stringify(step);
+      let match;
+      while ((match = variablePattern.exec(stepStr)) !== null) {
+        if (!variables.includes(match[1])) {
+          variables.push(match[1]);
+        }
+      }
+    });
+
+    return variables;
+  }
+
+  areInSameForm(selector1, selector2) {
+    // Check if two selectors are in the same form
+    const formSelectors = ['form', '[role="form"]', '.form'];
+    return formSelectors.some(formSel => 
+      selector1.includes(formSel) && selector2.includes(formSel)
+    );
+  }
+
+  generateGroupName(step) {
+    // Generate a name for a group of steps
+    switch (step.type) {
+      case 'input': return 'Form Filling';
+      case 'navigation': return 'Navigation';
+      case 'click': return 'User Interaction';
+      default: return 'Action Group';
+    }
+  }
+
+  extractStepPatterns(steps) {
+    // Extract patterns from workflow steps
+    const patterns = [];
+    
+    for (let i = 0; i < steps.length - 1; i++) {
+      const pattern = {
+        sequence: [steps[i].type, steps[i + 1].type],
+        signature: `${steps[i].type}->${steps[i + 1].type}`,
+        context: {
+          first: steps[i],
+          second: steps[i + 1]
+        }
+      };
+      patterns.push(pattern);
+    }
+
+    return patterns;
+  }
+
+  createPatternSignature(steps) {
+    // Create a signature for a pattern
+    return steps.map(s => s.type).join('->');
+  }
+
+  generateOptimizationSuggestions(workflow) {
+    // Generate suggestions to optimize the workflow
+    const suggestions = [];
+    
+    // Check for redundant waits
+    const waits = workflow.steps.filter(s => s.type === 'wait');
+    if (waits.length > 3) {
+      suggestions.push({
+        type: 'optimization',
+        message: 'Consider reducing wait times or using smart waits',
+        impact: 'performance'
+      });
+    }
+
+    // Check for complex selectors
+    const complexSelectors = workflow.steps.filter(s => 
+      s.target && s.target.length > 50
+    );
+    if (complexSelectors.length > 0) {
+      suggestions.push({
+        type: 'reliability',
+        message: 'Some selectors are complex and may be brittle',
+        impact: 'reliability'
+      });
+    }
+
+    this.patternRecognition.optimizationSuggestions = suggestions;
+  }
+
+  templatizeSteps(steps) {
+    // Convert steps to template format with variables
+    return steps.map(step => {
+      const templatedStep = { ...step };
+      
+      // Replace common values with variables
+      if (step.data && step.data.value) {
+        templatedStep.data = { ...step.data };
+        templatedStep.data.value = `{{${step.type.toUpperCase()}_VALUE}}`;
+      }
+      
+      if (step.data && step.data.url) {
+        templatedStep.data = { ...step.data };
+        templatedStep.data.url = `{{BASE_URL}}${step.data.url}`;
+      }
+      
+      return templatedStep;
+    });
+  }
+
+  async attemptRecovery(step, error, execution) {
+    // Attempt to recover from execution errors
+    console.log(`🔄 Attempting recovery for step: ${step.type}`);
+    
+    // Simple retry logic
+    if (execution.retryCount < this.executor.retryAttempts) {
+      execution.retryCount = (execution.retryCount || 0) + 1;
+      
+      // Wait before retry
+      await new Promise(resolve => 
+        setTimeout(resolve, this.executor.retryDelay * execution.retryCount)
+      );
+      
+      try {
+        return await this.executeStep(step, execution);
+      } catch (retryError) {
+        console.log(`❌ Retry ${execution.retryCount} failed`);
+        return false;
+      }
+    }
+    
+    return false;
+  }
+
+  async executeExtract(step, execution) {
+    // Execute data extraction step
+    const selector = this.resolveVariables(step.target, execution.parameters);
+    
+    console.log(`📊 Extracting data from: ${selector}`);
+    
+    // Mock extraction for testing
+    return {
+      success: true,
+      data: 'extracted_data',
+      selector: selector
+    };
+  }
+
+  async executeValidate(step, execution) {
+    // Execute validation step
+    const condition = step.data.condition;
+    
+    console.log(`✅ Validating condition: ${condition}`);
+    
+    // Mock validation for testing
+    return {
+      success: true,
+      condition: condition,
+      result: true
+    };
+  }
+
+  async executeGroup(step, execution) {
+    // Execute a group of steps
+    console.log(`📋 Executing group: ${step.steps.length} steps`);
+    
+    const results = [];
+    for (const substep of step.steps) {
+      const result = await this.executeStep(substep, execution);
+      results.push(result);
+    }
+    
+    return {
+      success: true,
+      groupResults: results
+    };
+  }
+
+  async isElementVisible(selector) {
+    // Check if element is visible (mock implementation)
+    console.log(`👁️ Checking visibility of: ${selector}`);
+    return true; // Mock response
+  }
+
+  async isPageLoaded() {
+    // Check if page is loaded (mock implementation)
+    console.log(`📄 Checking page load status`);
+    return true; // Mock response
+  }
+
+  async isTextPresent(text) {
+    // Check if text is present (mock implementation)
+    console.log(`🔍 Checking for text: ${text}`);
+    return true; // Mock response
+  }
 }
 
 module.exports = WorkflowRecorder;

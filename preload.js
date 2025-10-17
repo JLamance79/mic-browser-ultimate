@@ -1,27 +1,118 @@
-const { contextBridge, ipcRenderer } = require('electron');
+// Preload script startup debugging
+console.log('🔧 PRELOAD: Script starting execution...');
+
+let contextBridge, ipcRenderer;
+try {
+  const electron = require('electron');
+  contextBridge = electron.contextBridge;
+  ipcRenderer = electron.ipcRenderer;
+  console.log('🔧 PRELOAD: Electron modules loaded successfully');
+  console.log('🔧 PRELOAD: contextBridge available:', !!contextBridge);
+  console.log('🔧 PRELOAD: ipcRenderer available:', !!ipcRenderer);
+} catch (error) {
+  console.error('🔧 PRELOAD ERROR: Failed to load Electron modules:', error);
+  throw error;
+}
+
+// Input validation helpers
+const validateInput = {
+  isString: (value) => typeof value === 'string',
+  isObject: (value) => value && typeof value === 'object' && !Array.isArray(value),
+  isArray: (value) => Array.isArray(value),
+  isFunction: (value) => typeof value === 'function',
+  sanitizeString: (value) => {
+    if (typeof value !== 'string') return '';
+    return value.replace(/[<>]/g, '').trim();
+  },
+  sanitizeObject: (obj) => {
+    if (!obj || typeof obj !== 'object') return {};
+    return JSON.parse(JSON.stringify(obj)); // Deep clone and sanitize
+  }
+};
+
+// Safe IPC wrapper with error handling
+const safeInvoke = async (channel, ...args) => {
+  try {
+    // Basic input sanitization
+    const sanitizedArgs = args.map(arg => {
+      if (typeof arg === 'string') return validateInput.sanitizeString(arg);
+      if (typeof arg === 'object') return validateInput.sanitizeObject(arg);
+      return arg;
+    });
+    
+    return await ipcRenderer.invoke(channel, ...sanitizedArgs);
+  } catch (error) {
+    console.error(`IPC Error on channel ${channel}:`, error.message);
+    throw new Error(`Communication error: ${error.message}`);
+  }
+};
+
+// Safe event listener wrapper
+const safeOn = (channel, callback) => {
+  if (!validateInput.isFunction(callback)) {
+    throw new Error('Callback must be a function');
+  }
+  
+  return ipcRenderer.on(channel, (event, ...args) => {
+    try {
+      callback(event, ...args);
+    } catch (error) {
+      console.error(`Event handler error on ${channel}:`, error.message);
+    }
+  });
+};
 
 // Expose a safe API to the renderer
-contextBridge.exposeInMainWorld('electronAPI', {
-  onNewTab: (cb) => ipcRenderer.on('new-tab', cb),
-  onToggleAssistant: (cb) => ipcRenderer.on('toggle-assistant', cb),
-  onVoiceCommand: (cb) => ipcRenderer.on('voice-command', cb),
-  onQuickScan: (cb) => ipcRenderer.on('quick-scan', cb),
-  onFileSelected: (cb) => ipcRenderer.on('file-selected', cb),
-  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
-  // AI request functionality
-  aiRequest: (request) => ipcRenderer.invoke('ai-request', request),
-  // Enhanced OCR document scanning functionality
-  scanDocument: (imageData, options) => ipcRenderer.invoke('document-scan', imageData, options),
-  scanDocumentBatch: (documents, options) => ipcRenderer.invoke('document-scan-batch', documents, options),
+console.log('🔧 PRELOAD: Attempting to expose electronAPI...');
+console.log('🔧 PRELOAD: contextBridge available:', !!contextBridge);
+
+try {
+  const electronAPI = {
+  onNewTab: (cb) => safeOn('new-tab', cb),
+  onToggleAssistant: (cb) => safeOn('toggle-assistant', cb),
+  onVoiceCommand: (cb) => safeOn('voice-command', cb),
+  onQuickScan: (cb) => safeOn('quick-scan', cb),
+  onFileSelected: (cb) => safeOn('file-selected', cb),
+  getAppVersion: () => safeInvoke('get-app-version'),
+  // AI request functionality with input validation
+  aiRequest: (request) => {
+    if (!validateInput.isObject(request)) {
+      throw new Error('AI request must be an object');
+    }
+    return safeInvoke('ai-request', request);
+  },
+  // Enhanced OCR document scanning functionality with validation
+  scanDocument: (imageData, options = {}) => {
+    if (!imageData) {
+      throw new Error('Image data is required for document scanning');
+    }
+    return safeInvoke('document-scan', imageData, options);
+  },
+  scanDocumentBatch: (documents, options = {}) => {
+    if (!validateInput.isArray(documents) || documents.length === 0) {
+      throw new Error('Documents must be a non-empty array');
+    }
+    return safeInvoke('document-scan-batch', documents, options);
+  },
   initOCRLanguage: (language) => ipcRenderer.invoke('ocr-init-language', language),
   getOCRLanguages: () => ipcRenderer.invoke('ocr-get-languages'),
   
-  // Persistent Storage API
+  // Persistent Storage API with validation
   storage: {
     // Settings
-    getSetting: (key, defaultValue) => ipcRenderer.invoke('storage-get-setting', key, defaultValue),
-    setSetting: (key, value) => ipcRenderer.invoke('storage-set-setting', key, value),
-    getAllSettings: () => ipcRenderer.invoke('storage-get-all-settings'),
+    getSetting: (key, defaultValue) => {
+      if (!validateInput.isString(key) || key.trim() === '') {
+        throw new Error('Setting key must be a non-empty string');
+      }
+      return safeInvoke('storage-get-setting', key, defaultValue);
+    },
+    setSetting: (key, value) => {
+      if (!validateInput.isString(key) || key.trim() === '') {
+        throw new Error('Setting key must be a non-empty string');
+      }
+      return safeInvoke('storage-set-setting', key, value);
+    },
+    getAllSettings: () => safeInvoke('storage-get-all-settings'),
     
     // Bookmarks
     addBookmark: (url, title, folder, tags) => ipcRenderer.invoke('storage-add-bookmark', url, title, folder, tags),
@@ -90,27 +181,499 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Auto-updater API
   updater: {
-    checkForUpdates: () => ipcRenderer.invoke('updater-check-for-updates'),
-    downloadUpdate: () => ipcRenderer.invoke('updater-download-update'),
-    quitAndInstall: () => ipcRenderer.invoke('updater-quit-and-install'),
-    getVersion: () => ipcRenderer.invoke('updater-get-version'),
+    checkForUpdates: () => safeInvoke('auto-updater-check'),
+    downloadUpdate: () => safeInvoke('auto-updater-download'),
+    quitAndInstall: () => safeInvoke('auto-updater-install'),
+    getStatus: () => safeInvoke('auto-updater-status'),
+    getSettings: () => safeInvoke('auto-updater-settings'),
+    updateSettings: (settings) => {
+      if (!validateInput.isObject(settings)) {
+        throw new Error('Settings must be an object');
+      }
+      return safeInvoke('auto-updater-settings', settings);
+    },
     
-    // Event listeners
-    onUpdateChecking: (callback) => ipcRenderer.on('updater-checking', callback),
-    onUpdateAvailable: (callback) => ipcRenderer.on('updater-update-available', callback),
-    onUpdateNotAvailable: (callback) => ipcRenderer.on('updater-update-not-available', callback),
-    onUpdateError: (callback) => ipcRenderer.on('updater-error', callback),
-    onDownloadProgress: (callback) => ipcRenderer.on('updater-download-progress', callback),
-    onUpdateDownloaded: (callback) => ipcRenderer.on('updater-update-downloaded', callback),
+    // Event listeners for auto-updater events
+    onUpdateEvent: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('auto-updater', callback);
+    },
+    
+    // Legacy event listeners for compatibility
+    onUpdateChecking: (callback) => safeOn('updater-checking', callback),
+    onUpdateAvailable: (callback) => safeOn('updater-update-available', callback),
+    onUpdateNotAvailable: (callback) => safeOn('updater-update-not-available', callback),
+    onUpdateError: (callback) => safeOn('updater-error', callback),
+    onDownloadProgress: (callback) => safeOn('updater-download-progress', callback),
+    onUpdateDownloaded: (callback) => safeOn('updater-update-downloaded', callback),
     
     // Remove listeners
     removeAllListeners: () => {
+      ipcRenderer.removeAllListeners('auto-updater');
       ipcRenderer.removeAllListeners('updater-checking');
       ipcRenderer.removeAllListeners('updater-update-available');
       ipcRenderer.removeAllListeners('updater-update-not-available');
       ipcRenderer.removeAllListeners('updater-error');
       ipcRenderer.removeAllListeners('updater-download-progress');
       ipcRenderer.removeAllListeners('updater-update-downloaded');
+    }
+  },
+
+  // Crash Reporting API
+  crashReporting: {
+    getSettings: () => safeInvoke('crash-reporting:get-settings'),
+    updateSettings: (settings) => {
+      if (!validateInput.isObject(settings)) {
+        throw new Error('Settings must be an object');
+      }
+      return safeInvoke('crash-reporting:update-settings', settings);
+    },
+    getReports: (filters) => safeInvoke('crash-reporting:get-reports', filters),
+    getAnalytics: (timeRange) => safeInvoke('crash-reporting:get-analytics', timeRange),
+    clearReports: () => safeInvoke('crash-reporting:clear-reports'),
+    exportReports: (exportPath) => {
+      if (!validateInput.isString(exportPath) || exportPath.trim() === '') {
+        throw new Error('Export path must be a non-empty string');
+      }
+      return safeInvoke('crash-reporting:export-reports', exportPath);
+    },
+    testCrash: () => safeInvoke('crash-reporting:test-crash'),
+    
+    // Event listeners for crash reporting events
+    onCrashDetected: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('crash-reporting:crash-detected', callback);
+    },
+    onReportGenerated: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('crash-reporting:report-generated', callback);
+    },
+    
+    // Remove listeners
+    removeAllListeners: () => {
+      ipcRenderer.removeAllListeners('crash-reporting:crash-detected');
+      ipcRenderer.removeAllListeners('crash-reporting:report-generated');
+    }
+  },
+
+  // Crash Reporting API
+  crashReporting: {
+    getSettings: () => safeInvoke('crash-reporting:get-settings'),
+    updateSettings: (settings) => {
+      if (!validateInput.isObject(settings)) {
+        throw new Error('Settings must be an object');
+      }
+      return safeInvoke('crash-reporting:update-settings', settings);
+    },
+    getReports: (filters) => safeInvoke('crash-reporting:get-reports', filters),
+    getAnalytics: (timeRange) => safeInvoke('crash-reporting:get-analytics', timeRange),
+    clearReports: () => safeInvoke('crash-reporting:clear-reports'),
+    exportReports: (exportPath) => {
+      if (exportPath && (!validateInput.isString(exportPath) || exportPath.trim() === '')) {
+        throw new Error('Export path must be a non-empty string');
+      }
+      return safeInvoke('crash-reporting:export-reports', exportPath);
+    },
+    testCrash: () => safeInvoke('crash-reporting:test-crash'),
+    
+    // Event listeners for crash reporting events
+    onCrashDetected: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('crash-reporting:crash-detected', callback);
+    },
+    
+    onReportGenerated: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('crash-reporting:report-generated', callback);
+    },
+    
+    // Remove listeners
+    removeAllListeners: () => {
+      ipcRenderer.removeAllListeners('crash-reporting:crash-detected');
+      ipcRenderer.removeAllListeners('crash-reporting:report-generated');
+    }
+  },
+
+  // Native Notification API
+  notifications: {
+    // Show various types of notifications
+    show: (options) => {
+      if (!validateInput.isObject(options)) {
+        throw new Error('Notification options must be an object');
+      }
+      if (!options.title || !validateInput.isString(options.title)) {
+        throw new Error('Notification title is required and must be a string');
+      }
+      return safeInvoke('notification-show', options);
+    },
+    
+    showSystem: (title, body, options = {}) => {
+      if (!validateInput.isString(title) || title.trim() === '') {
+        throw new Error('Title must be a non-empty string');
+      }
+      if (body && !validateInput.isString(body)) {
+        throw new Error('Body must be a string');
+      }
+      if (!validateInput.isObject(options)) {
+        throw new Error('Options must be an object');
+      }
+      return safeInvoke('notification-show-system', title, body, options);
+    },
+    
+    showSecurity: (title, body, options = {}) => {
+      if (!validateInput.isString(title) || title.trim() === '') {
+        throw new Error('Title must be a non-empty string');
+      }
+      if (body && !validateInput.isString(body)) {
+        throw new Error('Body must be a string');
+      }
+      if (!validateInput.isObject(options)) {
+        throw new Error('Options must be an object');
+      }
+      return safeInvoke('notification-show-security', title, body, options);
+    },
+    
+    showUpdate: (title, body, options = {}) => {
+      if (!validateInput.isString(title) || title.trim() === '') {
+        throw new Error('Title must be a non-empty string');
+      }
+      if (body && !validateInput.isString(body)) {
+        throw new Error('Body must be a string');
+      }
+      if (!validateInput.isObject(options)) {
+        throw new Error('Options must be an object');
+      }
+      return safeInvoke('notification-show-update', title, body, options);
+    },
+    
+    showChat: (title, body, options = {}) => {
+      if (!validateInput.isString(title) || title.trim() === '') {
+        throw new Error('Title must be a non-empty string');
+      }
+      if (body && !validateInput.isString(body)) {
+        throw new Error('Body must be a string');
+      }
+      if (!validateInput.isObject(options)) {
+        throw new Error('Options must be an object');
+      }
+      return safeInvoke('notification-show-chat', title, body, options);
+    },
+    
+    showDownload: (title, body, options = {}) => {
+      if (!validateInput.isString(title) || title.trim() === '') {
+        throw new Error('Title must be a non-empty string');
+      }
+      if (body && !validateInput.isString(body)) {
+        throw new Error('Body must be a string');
+      }
+      if (!validateInput.isObject(options)) {
+        throw new Error('Options must be an object');
+      }
+      return safeInvoke('notification-show-download', title, body, options);
+    },
+    
+    showError: (title, body, options = {}) => {
+      if (!validateInput.isString(title) || title.trim() === '') {
+        throw new Error('Title must be a non-empty string');
+      }
+      if (body && !validateInput.isString(body)) {
+        throw new Error('Body must be a string');
+      }
+      if (!validateInput.isObject(options)) {
+        throw new Error('Options must be an object');
+      }
+      return safeInvoke('notification-show-error', title, body, options);
+    },
+    
+    showSuccess: (title, body, options = {}) => {
+      if (!validateInput.isString(title) || title.trim() === '') {
+        throw new Error('Title must be a non-empty string');
+      }
+      if (body && !validateInput.isString(body)) {
+        throw new Error('Body must be a string');
+      }
+      if (!validateInput.isObject(options)) {
+        throw new Error('Options must be an object');
+      }
+      return safeInvoke('notification-show-success', title, body, options);
+    },
+    
+    // Notification management
+    close: (notificationId) => {
+      if (!validateInput.isString(notificationId) || notificationId.trim() === '') {
+        throw new Error('Notification ID must be a non-empty string');
+      }
+      return safeInvoke('notification-close', notificationId);
+    },
+    
+    closeAll: () => safeInvoke('notification-close-all'),
+    
+    // Settings management
+    getSettings: () => safeInvoke('notification-get-settings'),
+    
+    updateSettings: (settings) => {
+      if (!validateInput.isObject(settings)) {
+        throw new Error('Settings must be an object');
+      }
+      return safeInvoke('notification-update-settings', settings);
+    },
+    
+    // History management
+    getHistory: () => safeInvoke('notification-get-history'),
+    
+    markAsRead: (notificationId) => {
+      if (!validateInput.isString(notificationId) || notificationId.trim() === '') {
+        throw new Error('Notification ID must be a non-empty string');
+      }
+      return safeInvoke('notification-mark-read', notificationId);
+    },
+    
+    clearHistory: () => safeInvoke('notification-clear-history'),
+    
+    // System information
+    getInfo: () => safeInvoke('notification-get-info'),
+    
+    // Event listeners for notification events
+    onClicked: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('notification-clicked', callback);
+    },
+    
+    onClosed: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('notification-closed', callback);
+    },
+    
+    onAction: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('notification-action', callback);
+    },
+    
+    onSettingsUpdated: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('notification-settings-updated', callback);
+    },
+    
+    onHistoryUpdated: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('notification-history-updated', callback);
+    },
+    
+    // Remove listeners
+    removeAllListeners: () => {
+      ipcRenderer.removeAllListeners('notification-clicked');
+      ipcRenderer.removeAllListeners('notification-closed');
+      ipcRenderer.removeAllListeners('notification-action');
+      ipcRenderer.removeAllListeners('notification-settings-updated');
+      ipcRenderer.removeAllListeners('notification-history-updated');
+    }
+  },
+
+  // Deep Link API
+  deepLink: {
+    // Handle deep link
+    handle: (url) => {
+      if (!validateInput.isString(url) || url.trim() === '') {
+        throw new Error('URL must be a non-empty string');
+      }
+      return safeInvoke('deeplink-handle', url);
+    },
+    
+    // Generate deep link
+    generate: (action, params = {}) => {
+      if (!validateInput.isString(action) || action.trim() === '') {
+        throw new Error('Action must be a non-empty string');
+      }
+      if (!validateInput.isObject(params)) {
+        throw new Error('Params must be an object');
+      }
+      return safeInvoke('deeplink-generate', action, params);
+    },
+    
+    // Get settings
+    getSettings: () => safeInvoke('deeplink-get-settings'),
+    
+    // Update settings
+    updateSettings: (settings) => {
+      if (!validateInput.isObject(settings)) {
+        throw new Error('Settings must be an object');
+      }
+      return safeInvoke('deeplink-update-settings', settings);
+    },
+    
+    // Get history
+    getHistory: () => safeInvoke('deeplink-get-history'),
+    
+    // Clear history
+    clearHistory: () => safeInvoke('deeplink-clear-history'),
+    
+    // Get statistics
+    getStatistics: () => safeInvoke('deeplink-get-statistics'),
+    
+    // Register custom route
+    registerRoute: (action) => {
+      if (!validateInput.isString(action) || action.trim() === '') {
+        throw new Error('Action must be a non-empty string');
+      }
+      return safeInvoke('deeplink-register-route', action);
+    },
+    
+    // Add security rule
+    addSecurityRule: (pattern) => {
+      if (!validateInput.isString(pattern) && !(pattern instanceof RegExp)) {
+        throw new Error('Pattern must be a string or RegExp');
+      }
+      return safeInvoke('deeplink-add-security-rule', pattern.toString());
+    },
+    
+    // Event listeners for deep link events
+    onNavigateToChat: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('navigate-to-chat', callback);
+    },
+    
+    onPerformSearch: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('perform-search', callback);
+    },
+    
+    onOpenSettings: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('open-settings-tab', callback);
+    },
+    
+    onTriggerOCR: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('trigger-ocr', callback);
+    },
+    
+    onHandleTransfer: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('handle-transfer', callback);
+    },
+    
+    onHandleAuth: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('handle-auth', callback);
+    },
+    
+    onCustomRoute: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('custom-deeplink-route', callback);
+    },
+    
+    // Remove listeners
+    removeAllListeners: () => {
+      ipcRenderer.removeAllListeners('navigate-to-chat');
+      ipcRenderer.removeAllListeners('perform-search');
+      ipcRenderer.removeAllListeners('open-settings-tab');
+      ipcRenderer.removeAllListeners('trigger-ocr');
+      ipcRenderer.removeAllListeners('handle-transfer');
+      ipcRenderer.removeAllListeners('handle-auth');
+      ipcRenderer.removeAllListeners('custom-deeplink-route');
+    }
+  },
+
+  // System Tray API
+  systemTray: {
+    // Get system tray settings
+    getSettings: () => {
+      return safeInvoke('system-tray-get-settings');
+    },
+    
+    // Update system tray settings
+    updateSettings: (settings) => {
+      if (!validateInput.isObject(settings)) {
+        throw new Error('Settings must be an object');
+      }
+      return safeInvoke('system-tray-update-settings', settings);
+    },
+    
+    // Get system tray statistics
+    getStatistics: () => {
+      return safeInvoke('system-tray-get-statistics');
+    },
+    
+    // Show system tray notification
+    showNotification: (title, body, type = 'info') => {
+      if (!validateInput.isString(title) || title.trim() === '') {
+        throw new Error('Title must be a non-empty string');
+      }
+      if (!validateInput.isString(body) || body.trim() === '') {
+        throw new Error('Body must be a non-empty string');
+      }
+      if (!validateInput.isString(type) || !['info', 'warning', 'error', 'success'].includes(type)) {
+        throw new Error('Type must be one of: info, warning, error, success');
+      }
+      return safeInvoke('system-tray-show-notification', title, body, type);
+    },
+    
+    // Update tray tooltip
+    updateTooltip: (tooltip) => {
+      if (!validateInput.isString(tooltip) || tooltip.trim() === '') {
+        throw new Error('Tooltip must be a non-empty string');
+      }
+      return safeInvoke('system-tray-update-tooltip', tooltip);
+    },
+    
+    // Check if system tray is supported
+    isSupported: () => {
+      return safeInvoke('system-tray-is-supported');
+    },
+    
+    // Event listeners for system tray actions
+    onQuickAction: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('tray-quick-action', callback);
+    },
+    
+    onShowStatistics: (callback) => {
+      if (!validateInput.isFunction(callback)) {
+        throw new Error('Callback must be a function');
+      }
+      return safeOn('show-tray-statistics', callback);
+    },
+    
+    // Remove listeners
+    removeAllListeners: () => {
+      ipcRenderer.removeAllListeners('tray-quick-action');
+      ipcRenderer.removeAllListeners('show-tray-statistics');
     }
   },
 
@@ -361,10 +924,68 @@ contextBridge.exposeInMainWorld('electronAPI', {
   system: {
     openPluginsFolder: () => ipcRenderer.invoke('system:open-plugins-folder'),
     getPluginsDir: () => ipcRenderer.invoke('system:get-plugins-dir')
+  },
+  
+  // External Link Handler
+  openExternalLink: (url) => {
+    if (!validateInput.isString(url) || url.trim() === '') {
+      throw new Error('URL must be a non-empty string');
+    }
+    const sanitizedUrl = validateInput.sanitizeString(url);
+    return safeInvoke('open-external-link', sanitizedUrl);
+  },
+  
+  // API Ready Check
+  isReady: () => Promise.resolve(true)
+  };
+  
+  console.log('🔧 PRELOAD: About to expose electronAPI object...');
+  
+  // Use contextBridge with context isolation enabled
+  contextBridge.exposeInMainWorld('electronAPI', electronAPI);
+  console.log('🔧 PRELOAD: electronAPI exposed via contextBridge successfully!');
+  
+  // DIRECT WINDOW FALLBACK: Ensure main functionality works regardless of contextBridge issues
+  try {
+    window._electronAPITest = 'PRELOAD_SUCCESS';
+    window.electronAPI = electronAPI; // Direct fallback assignment
+    console.log('🔧 PRELOAD: Direct window APIs written successfully');
+    console.log('🔧 PRELOAD: electronAPI.openExternalLink available via window:', typeof window.electronAPI.openExternalLink);
+  } catch (error) {
+    console.error('🔧 PRELOAD ERROR: Cannot write to window:', error);
   }
-});
+} catch (error) {
+  console.error('🔧 PRELOAD ERROR: Failed to expose electronAPI:', error);
+  console.error('🔧 PRELOAD ERROR Stack:', error.stack);
+}
 
-// Node-specific info (platform)
-contextBridge.exposeInMainWorld('nodeAPI', {
-  platform: process.platform,
+// System info (safe platform detection)
+const platformInfo = process.platform;
+const devMode = process.env.NODE_ENV === 'development' || process.argv.includes('--dev');
+
+// COMBINED API EXPOSURE - Single contextBridge call to avoid conflicts
+console.log('🔧 PRELOAD: Adding nodeAPI and isDev to window...');
+try {
+  contextBridge.exposeInMainWorld('nodeAPI', {
+    platform: platformInfo, // Safe: only platform string, not process object
+  });
+  console.log('🔧 PRELOAD: nodeAPI exposed via contextBridge successfully');
+  
+  contextBridge.exposeInMainWorld('isDev', devMode);
+  console.log('🔧 PRELOAD: isDev exposed via contextBridge successfully');
+} catch (error) {
+  console.error('🔧 PRELOAD ERROR: Failed to expose nodeAPI/isDev:', error);
+}
+
+// Preload script loaded successfully
+console.log('🔧 Preload script execution complete');
+
+// Notify renderer that preload is complete
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('🔧 Preload DOMContentLoaded triggered');
+  // Send ready signal to renderer after a short delay to ensure all APIs are exposed
+  setTimeout(() => {
+    console.log('🔧 Dispatching electronapi-ready event');
+    window.dispatchEvent(new CustomEvent('electronapi-ready'));
+  }, 50);
 });

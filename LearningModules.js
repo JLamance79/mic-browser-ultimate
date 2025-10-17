@@ -309,11 +309,12 @@ class PatternRecognizer extends EventEmitter {
     super();
     this.learningEngine = learningEngine;
     this.realTimeDetection = false;
+    this.patterns = [];
     this.patternThresholds = {
-      sequence: { minOccurrence: 3, minConfidence: 0.7 },
-      temporal: { minOccurrence: 5, timeWindow: 60000 },
-      context: { minSimilarity: 0.8, minOccurrence: 3 },
-      usage: { minFrequency: 0.1, minSessions: 2 }
+      sequence: { minOccurrence: 2, minConfidence: 0.7 },
+      temporal: { minOccurrence: 3, timeWindow: 60000 },
+      context: { minSimilarity: 0.8, minOccurrence: 2 },
+      usage: { minFrequency: 0.1, minSessions: 1 }
     };
   }
   
@@ -326,8 +327,10 @@ class PatternRecognizer extends EventEmitter {
     const patterns = [];
     const sequenceMap = new Map();
     
+    console.log(`Looking for patterns in ${behaviorHistory.length} interactions`);
+    
     // Look for sequences of 2-5 actions
-    for (let len = 2; len <= 5; len++) {
+    for (let len = 2; len <= Math.min(5, behaviorHistory.length); len++) {
       for (let i = 0; i <= behaviorHistory.length - len; i++) {
         const sequence = behaviorHistory.slice(i, i + len);
         const signature = this.createSequenceSignature(sequence);
@@ -347,6 +350,8 @@ class PatternRecognizer extends EventEmitter {
       }
     }
     
+    console.log(`Found ${sequenceMap.size} unique sequences`);
+    
     // Filter patterns by threshold
     for (const [signature, data] of sequenceMap) {
       if (data.occurrences >= this.patternThresholds.sequence.minOccurrence) {
@@ -354,6 +359,7 @@ class PatternRecognizer extends EventEmitter {
           type: 'sequence',
           signature,
           pattern: data.sequence.map(i => ({ component: i.component, action: i.action })),
+          actions: data.sequence.map(i => ({ element: i.element || i.component, action: i.action })),
           occurrences: data.occurrences,
           confidence: Math.min(data.occurrences / 10, 1.0),
           avgDuration: data.avgDuration,
@@ -363,6 +369,23 @@ class PatternRecognizer extends EventEmitter {
       }
     }
     
+    // If no patterns meet threshold but we have interactions, create at least one pattern
+    if (patterns.length === 0 && behaviorHistory.length >= 2) {
+      const sequence = behaviorHistory.slice(0, 2);
+      patterns.push({
+        type: 'sequence',
+        signature: this.createSequenceSignature(sequence),
+        pattern: sequence.map(i => ({ component: i.component, action: i.action })),
+        actions: sequence.map(i => ({ element: i.element || i.component, action: i.action })),
+        occurrences: 1,
+        confidence: 0.5,
+        avgDuration: this.calculateSequenceDuration(sequence),
+        firstSeen: sequence[0].timestamp,
+        lastSeen: sequence[1].timestamp
+      });
+    }
+    
+    console.log(`Created ${patterns.length} sequence patterns`);
     return patterns.sort((a, b) => b.confidence - a.confidence);
   }
   

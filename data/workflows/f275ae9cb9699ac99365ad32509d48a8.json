@@ -1,0 +1,110 @@
+{
+  "id": "f275ae9cb9699ac99365ad32509d48a8",
+  "name": "Test Workflow",
+  "description": "Workflow with 1 navigation(s), 1 click(s), 1 input(s)",
+  "created": 1760645868129,
+  "modified": 1760645868131,
+  "version": "1.0.0",
+  "steps": [
+    {
+      "type": "group",
+      "name": "Navigation",
+      "steps": [
+        {
+          "id": "0ffe0ab35f606243",
+          "timestamp": 1760645868130,
+          "type": "navigation",
+          "action": "navigate",
+          "target": "https://example.com",
+          "data": {
+            "url": "https://example.com"
+          },
+          "context": {
+            "viewport": "1920x1080"
+          },
+          "screenshot": null,
+          "validation": null
+        }
+      ],
+      "parallel": false
+    },
+    {
+      "type": "group",
+      "name": "User Interaction",
+      "steps": [
+        {
+          "id": "8fdb1ac0126374d7",
+          "timestamp": 1760645868130,
+          "type": "click",
+          "action": "click",
+          "target": "#login-button",
+          "data": {
+            "button": "left"
+          },
+          "context": {
+            "element": "button"
+          },
+          "screenshot": null,
+          "validation": null
+        }
+      ],
+      "parallel": false
+    },
+    {
+      "type": "group",
+      "name": "Form Filling",
+      "steps": [
+        {
+          "id": "d9e3c30048a5a681",
+          "timestamp": 1760645868130,
+          "type": "input",
+          "action": "type",
+          "target": "#username",
+          "data": {
+            "value": "testuser"
+          },
+          "context": {
+            "field": "text"
+          },
+          "screenshot": null,
+          "validation": null
+        }
+      ],
+      "parallel": false
+    }
+  ],
+  "context": {
+    "url": "https://example.com",
+    "userAgent": "Test Agent",
+    "screenResolution": "1920x1080"
+  },
+  "metadata": {
+    "duration": 2,
+    "stepCount": 3,
+    "complexity": 4,
+    "estimatedExecutionTime": 4500
+  },
+  "settings": {
+    "captureClicks": true,
+    "captureTyping": true,
+    "captureNavigation": true,
+    "captureScrolling": false,
+    "captureHovers": false,
+    "ignoreSystem": true,
+    "smartGrouping": true,
+    "autoOptimize": true
+  },
+  "tags": [
+    "navigation",
+    "click",
+    "button",
+    "input"
+  ],
+  "category": "form-filling",
+  "validation": {
+    "requiredElements": [],
+    "expectedDuration": 4500,
+    "criticalSteps": []
+  },
+  "variables": []
+}

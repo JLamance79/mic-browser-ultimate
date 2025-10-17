@@ -1,0 +1,33 @@
+{
+  "id": "test-workflow-123",
+  "name": "Storage Test Workflow",
+  "description": "Test workflow for storage validation",
+  "created": 1760645868135,
+  "modified": 1760645868135,
+  "version": "1.0.0",
+  "steps": [
+    {
+      "id": "step1",
+      "type": "navigation",
+      "action": "navigate",
+      "target": "https://test.com",
+      "data": {
+        "url": "https://test.com"
+      }
+    },
+    {
+      "id": "step2",
+      "type": "click",
+      "action": "click",
+      "target": "#test-button",
+      "data": {
+        "button": "left"
+      }
+    }
+  ],
+  "metadata": {
+    "stepCount": 2,
+    "complexity": 1.5,
+    "estimatedExecutionTime": 3000
+  }
+}

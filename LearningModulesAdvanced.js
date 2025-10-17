@@ -501,6 +501,7 @@ class PredictionModel extends EventEmitter {
       ai: new AIPredictor(learningEngine.aiSystem)
     };
     this.continuousLearning = false;
+    this.continuousLearningInterval = null;
   }
   
   async initialize() {
@@ -537,7 +538,7 @@ class PredictionModel extends EventEmitter {
     this.continuousLearning = true;
     
     // Update models every 30 minutes
-    setInterval(() => {
+    this.continuousLearningInterval = setInterval(() => {
       if (this.continuousLearning) {
         this.updateAllModels();
       }
@@ -548,6 +549,10 @@ class PredictionModel extends EventEmitter {
   
   stopContinuousLearning() {
     this.continuousLearning = false;
+    if (this.continuousLearningInterval) {
+      clearInterval(this.continuousLearningInterval);
+      this.continuousLearningInterval = null;
+    }
     console.log('🔄 Continuous learning stopped');
   }
   

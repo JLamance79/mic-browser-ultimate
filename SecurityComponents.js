@@ -120,15 +120,18 @@ class SecurityPolicyEngine extends EventEmitter {
 
     async setupContentSecurityPolicy() {
         const csp = {
-            'default-src': ["'self'"],
-            'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-            'style-src': ["'self'", "'unsafe-inline'"],
-            'img-src': ["'self'", "data:", "https:"],
-            'connect-src': ["'self'", "https:"],
-            'font-src': ["'self'", "https:"],
+            'default-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "data:", "blob:", "https:", "wss:", "ws:"],
+            'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com"],
+            'style-src': ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+            'style-src-elem': ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+            'img-src': ["'self'", "data:", "blob:", "https:"],
+            'connect-src': ["'self'", "https:", "wss:", "ws:", "http://localhost:*", "https://api.*", "https://*.supabase.co"],
+            'font-src': ["'self'", "https://cdnjs.cloudflare.com", "data:"],
+            'worker-src': ["'self'", "blob:", "data:"],
             'object-src': ["'none'"],
-            'media-src': ["'self'"],
-            'frame-src': ["'none'"]
+            'media-src': ["'self'", "data:", "blob:"],
+            'frame-src': ["'none'"],
+            'child-src': ["'self'", "blob:"]
         };
         
         this.policies.set('csp', csp);

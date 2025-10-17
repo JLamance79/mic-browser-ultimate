@@ -16,6 +16,11 @@ const { getSecurityManager } = require('./SecurityManager');
 const PluginManager = require('./PluginManager');
 const PluginDeveloper = require('./PluginDeveloper');
 const { i18n } = require('./I18nManager');
+const AutoUpdaterManager = require('./AutoUpdater');
+const CrashReportingSystem = require('./CrashReporter');
+const NativeNotificationManager = require('./NativeNotificationManager');
+const DeepLinkManager = require('./DeepLinkManager');
+const SystemTrayManager = require('./SystemTrayManager');
 
 // Analytics & Telemetry Configuration
 // Replace 'UA-XXXXXXXX-X' with your actual Google Analytics tracking ID
@@ -75,6 +80,11 @@ let adaptiveUI;
 let securityManager;
 let pluginManager;
 let pluginDeveloper;
+let autoUpdaterManager;
+let crashReporter;
+let notificationManager;
+let deepLinkManager;
+let systemTrayManager;
 
 function createWindow() {
   // Create the browser window
@@ -96,16 +106,22 @@ function createWindow() {
       symbolColor: '#e0e0e0',
     },
     webPreferences: {
-      nodeIntegration: false, // Security best practice
-      contextIsolation: true, // Security best practice
-      enableRemoteModule: false, // Security best practice
-      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false, // Security best practice - DISABLED in renderer
+      contextIsolation: true, // Security best practice - ENABLED (FIXED)
+      enableRemoteModule: false, // Security best practice - DISABLED
+      webviewTag: true, // Required for webview elements in browser tabs
+      preload: (() => {
+        const preloadPath = path.join(__dirname, 'preload.js');
+        console.log('🔧 MAIN: Preload path set to:', preloadPath);
+        console.log('🔧 MAIN: Preload file exists:', require('fs').existsSync(preloadPath));
+        return preloadPath;
+      })(),
       webSecurity: true,
       allowRunningInsecureContent: false,
       experimentalFeatures: false,
       enableBlinkFeatures: '',
       disableBlinkFeatures: 'Auxclick',
-      sandbox: false, // Required for our preload script
+      sandbox: false, // Required for our preload script functionality
       safeDialogs: true,
       safeDialogsMessage: 'This page is trying to show multiple dialogs.',
       spellcheck: true,
@@ -114,6 +130,19 @@ function createWindow() {
     },
     icon: iconPath,
     show: false, // Don't show until ready
+  });
+
+  // Add preload error handling
+  mainWindow.webContents.on('preload-error', (event, preloadPath, error) => {
+    console.error('🔧 MAIN ERROR: Preload script error:', error);
+    console.error('🔧 MAIN ERROR: Preload path:', preloadPath);
+  });
+
+  // Capture console messages from renderer to check preload logs
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    if (message.includes('🔧 PRELOAD')) {
+      console.log(`🔧 MAIN: Preload console [${level}]:`, message);
+    }
   });
 
   // Load the app
@@ -148,16 +177,57 @@ function createWindow() {
     mainWindow = null;
   });
 
-  // Handle external links
+  // Handle external links - Enhanced for comprehensive coverage
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
+    // Always open new windows in external browser
+    console.log(`🔗 setWindowOpenHandler triggered for: ${url}`);
+    try {
+      shell.openExternal(url).then(() => {
+        console.log(`✅ Successfully opened external URL: ${url}`);
+      }).catch(error => {
+        console.error(`❌ Failed to open external URL: ${url}`, error);
+      });
+    } catch (error) {
+      console.error(`❌ Error in setWindowOpenHandler: ${url}`, error);
+    }
     return { action: 'deny' };
   });
 
-  // Security: Prevent new window creation
+  // Security: Prevent new window creation (deprecated but still needed for older Electron)
   mainWindow.webContents.on('new-window', (event, url) => {
     event.preventDefault();
-    shell.openExternal(url);
+    console.log(`🔗 new-window event triggered for: ${url}`);
+    try {
+      shell.openExternal(url).then(() => {
+        console.log(`✅ Successfully opened external URL (new-window): ${url}`);
+      }).catch(error => {
+        console.error(`❌ Failed to open external URL (new-window): ${url}`, error);
+      });
+    } catch (error) {
+      console.error(`❌ Error in new-window handler: ${url}`, error);
+    }
+  });
+
+  // Handle navigation to external URLs in main window
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    const currentURL = mainWindow.webContents.getURL();
+    const currentOrigin = new URL(currentURL).origin;
+    
+    try {
+      const newURL = new URL(url);
+      
+      // If navigating to a different origin, open in external browser
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        if (newURL.origin !== currentOrigin && !url.includes('localhost') && !url.includes('127.0.0.1')) {
+          event.preventDefault();
+          console.log(`External navigation blocked, opening in browser: ${url}`);
+          shell.openExternal(url);
+        }
+      }
+    } catch (error) {
+      // If URL parsing fails, assume it's safe internal navigation
+      console.log(`URL parsing failed for: ${url}, allowing internal navigation`);
+    }
   });
   
   // Plugin system event integration
@@ -215,77 +285,41 @@ function setupBrowserPluginHooks() {
 
 // Auto-updater configuration
 function setupAutoUpdater() {
-  // Configure auto-updater
-  if (!isDev) {
-    // Set GitHub as update provider
-    autoUpdater.setFeedURL({
-      provider: 'github',
-      owner: 'JLamance79',
-      repo: 'mic-browser-ultimate'
-    });
-
-    // Enable verbose logging for debugging
-    autoUpdater.logger = console;
-    autoUpdater.logger.transports.file.level = 'info';
-    console.log('🔄 Auto-updater configured for GitHub releases');
-
-    // Auto-updater event handlers
-    autoUpdater.on('checking-for-update', () => {
-      console.log('Checking for update...');
-      if (mainWindow) {
-        mainWindow.webContents.send('updater-checking');
-      }
-    });
-
-    autoUpdater.on('update-available', (info) => {
-      console.log('Update available:', info);
-      if (mainWindow) {
-        mainWindow.webContents.send('updater-update-available', info);
-      }
-    });
-
-    autoUpdater.on('update-not-available', (info) => {
-      console.log('Update not available:', info);
-      if (mainWindow) {
-        mainWindow.webContents.send('updater-update-not-available', info);
-      }
-    });
-
-    autoUpdater.on('error', (err) => {
-      console.error('Update error:', err);
-      if (mainWindow) {
-        mainWindow.webContents.send('updater-error', err.message);
-      }
-    });
-
-    autoUpdater.on('download-progress', (progressObj) => {
-      let log_message = `Download speed: ${progressObj.bytesPerSecond}`;
-      log_message = log_message + ` - Downloaded ${progressObj.percent}%`;
-      log_message = log_message + ` (${progressObj.transferred}/${progressObj.total})`;
-      console.log(log_message);
-      
-      if (mainWindow) {
-        mainWindow.webContents.send('updater-download-progress', progressObj);
-      }
-    });
-
-    autoUpdater.on('update-downloaded', (info) => {
-      console.log('Update downloaded:', info);
-      if (mainWindow) {
-        mainWindow.webContents.send('updater-update-downloaded', info);
-      }
-    });
-
-    // Check for updates every 30 minutes in production
-    setInterval(() => {
-      autoUpdater.checkForUpdatesAndNotify();
-    }, 30 * 60 * 1000);
-
-    // Initial check 30 seconds after app start
-    setTimeout(() => {
-      autoUpdater.checkForUpdatesAndNotify();
-    }, 30000);
-  }
+  console.log('🔄 Setting up enhanced auto-updater...');
+  
+  // Initialize the comprehensive auto-updater
+  autoUpdaterManager = new AutoUpdaterManager();
+  
+  // Add IPC handlers for auto-updater
+  ipcMain.handle('auto-updater-check', async () => {
+    return await autoUpdaterManager.checkForUpdates(true);
+  });
+  
+  ipcMain.handle('auto-updater-download', async () => {
+    return await autoUpdaterManager.downloadUpdate();
+  });
+  
+  ipcMain.handle('auto-updater-install', () => {
+    autoUpdaterManager.quitAndInstall();
+  });
+  
+  ipcMain.handle('auto-updater-status', () => {
+    return autoUpdaterManager.getStatus();
+  });
+  
+  ipcMain.handle('auto-updater-settings', async (event, settings) => {
+    if (settings) {
+      await autoUpdaterManager.updateSettings(settings);
+    }
+    return autoUpdaterManager.settings;
+  });
+  
+  // Initialize auto-updater after a short delay
+  setTimeout(async () => {
+    await autoUpdaterManager.initialize();
+  }, 3000);
+  
+  console.log('🔄 Enhanced auto-updater configured');
 }
 
 // Memory Management Setup
@@ -326,15 +360,18 @@ async function setupSecurityPolicies() {
         responseHeaders: {
           ...details.responseHeaders,
           'Content-Security-Policy': [
-            "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob: wss:; " +
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-            "style-src 'self' 'unsafe-inline'; " +
-            "img-src 'self' data: https:; " +
-            "connect-src 'self' https: wss:; " +
-            "font-src 'self' https:; " +
+            "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob: wss: ws:; " +
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; " +
+            "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; " +
+            "style-src-elem 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; " +
+            "img-src 'self' data: blob: https:; " +
+            "connect-src 'self' https: wss: ws: http://localhost:* https://api.* https://*.supabase.co; " +
+            "font-src 'self' https://cdnjs.cloudflare.com data:; " +
+            "worker-src 'self' blob: data:; " +
             "object-src 'none'; " +
-            "media-src 'self'; " +
-            "frame-src 'none';"
+            "media-src 'self' data: blob:; " +
+            "frame-src 'none'; " +
+            "child-src 'self' blob:;"
           ],
           'X-Frame-Options': ['DENY'],
           'X-Content-Type-Options': ['nosniff'],
@@ -408,6 +445,18 @@ app.whenReady().then(async () => {
     securityManager = getSecurityManager();
     await securityManager.initialize();
     
+    // Initialize crash reporting system
+    await initializeCrashReporting();
+    
+    // Initialize native notification system
+    await initializeNotificationManager();
+    
+    // Initialize deep link system
+    await initializeDeepLinkManager();
+    
+    // Initialize system tray manager
+    await initializeSystemTrayManager();
+    
     // Initialize i18n system
     await i18n.initialize();
     console.log('🌐 I18n system initialized');
@@ -418,6 +467,9 @@ app.whenReady().then(async () => {
     // Initialize persistent storage with security integration
     storage = new PersistentStorage();
     await storage.initialize();
+    
+    // Setup core IPC handlers BEFORE creating window
+    setupCoreIpcHandlers();
     
     createWindow();
     createMenu();
@@ -490,6 +542,11 @@ app.on('window-all-closed', async () => {
     // Clean up learning system
     if (learningEngine) {
       await learningEngine.shutdown();
+    }
+    
+    // Clean up deep link system
+    if (deepLinkManager) {
+      await deepLinkManager.destroy();
     }
     
     // Clean up adaptive UI
@@ -1001,6 +1058,23 @@ const themes = {
   }
 };
 
+// ================================================================
+// IPC HANDLERS SETUP
+// ================================================================
+
+function setupCoreIpcHandlers() {
+  console.log('🔧 Registering core IPC handlers...');
+  
+  // Theme Management IPC Handlers
+  setupThemeIpcHandlers();
+  
+  // Other core handlers can be added here
+  console.log('✅ Core IPC handlers registered');
+}
+
+function setupThemeIpcHandlers() {
+  console.log('🎨 Setting up theme IPC handlers...');
+
 // Theme IPC handlers
 ipcMain.handle('set-theme', async (event, themeName) => {
   try {
@@ -1061,6 +1135,9 @@ ipcMain.handle('get-available-themes', async (event) => {
     return { success: false, error: error.message };
   }
 });
+
+  console.log('✅ Theme IPC handlers registered');
+}
 
 // Enhanced OCR document scanning handler
 const { EnhancedOCRProcessor } = require('./EnhancedOCRProcessor');
@@ -1246,6 +1323,888 @@ async function initializePluginSystem() {
         pluginManager = null;
         pluginDeveloper = null;
     }
+}
+
+// Initialize Crash Reporting System
+async function initializeCrashReporting() {
+    try {
+        console.log('🚨 Initializing Crash Reporting System...');
+        
+        let crashReporter = null;
+        
+        // Always setup IPC handlers, but functionality depends on mode
+        if (!isDev) {
+            // Only initialize in production builds
+            crashReporter = new CrashReportingSystem({
+                appName: 'MIC Browser Ultimate',
+                appVersion: app.getVersion(),
+                platform: process.platform,
+                environment: isDev ? 'development' : 'production',
+                privacy: {
+                    collectUserData: false, // Default to privacy-first
+                    collectSystemInfo: true,
+                    collectPerformanceData: true
+                }
+            });
+            
+            await crashReporter.initialize();
+            
+            // Store global reference
+            global.crashReporter = crashReporter;
+            
+            console.log('✅ Crash Reporting System initialized successfully');
+        } else {
+            console.log('🚨 Crash reporting disabled in development mode');
+        }
+        
+        // Setup crash reporter IPC handlers (always, but with dev mode handling)
+        setupCrashReportingIpcHandlers(crashReporter);
+        
+        // Track crash reporting initialization
+        ga.event('Feature', 'CrashReportingInitialized', isDev ? 'Disabled' : 'Success').send();
+        
+    } catch (error) {
+        console.error('❌ Crash Reporting System initialization failed:', error);
+        // Still setup handlers for graceful degradation
+        setupCrashReportingIpcHandlers(null);
+        // Track crash reporting initialization failure
+        ga.event('Feature', 'CrashReportingInitialized', 'Failed').send();
+    }
+}
+
+// Initialize native notification manager
+async function initializeNotificationManager() {
+    try {
+        console.log('🔔 Initializing Native Notification System...');
+        
+        notificationManager = new NativeNotificationManager();
+        
+        // Initialize the notification system
+        const success = await notificationManager.init();
+        
+        if (success) {
+            // Store global reference
+            global.notificationManager = notificationManager;
+            
+            // Setup notification event handlers
+            setupNotificationHandlers();
+            
+            // Setup notification IPC handlers
+            setupNotificationIpcHandlers();
+            
+            console.log('✅ Native Notification System initialized successfully');
+            
+            // Show welcome notification in development
+            if (isDev) {
+                setTimeout(() => {
+                    notificationManager.showSystemNotification(
+                        'MIC Browser Ultimate',
+                        'Native notifications are now active!',
+                        { 
+                            urgency: 'low',
+                            clickAction: { type: 'app' }
+                        }
+                    );
+                }, 2000);
+            }
+        } else {
+            console.warn('⚠️ Native notifications not supported on this system');
+        }
+        
+        // Track notification system initialization
+        ga.event('Feature', 'NotificationSystemInitialized', success ? 'Success' : 'Unsupported').send();
+        
+    } catch (error) {
+        console.error('❌ Native Notification System initialization failed:', error);
+        // Track notification system initialization failure
+        ga.event('Feature', 'NotificationSystemInitialized', 'Failed').send();
+    }
+}
+
+// Initialize deep link manager
+async function initializeDeepLinkManager() {
+    try {
+        console.log('🔗 Initializing Deep Link System...');
+        
+        deepLinkManager = new DeepLinkManager({
+            protocol: 'mic-browser',
+            enableSecurityValidation: true,
+            enableLogging: true,
+            maxUrlLength: 2048,
+            enableHistory: true
+        });
+        
+        // Initialize the deep link system
+        const success = await deepLinkManager.initialize();
+        
+        if (success) {
+            // Store global reference
+            global.deepLinkManager = deepLinkManager;
+            
+            // Setup deep link event handlers
+            setupDeepLinkHandlers();
+            
+            // Setup deep link IPC handlers
+            setupDeepLinkIpcHandlers();
+            
+            console.log('✅ Deep Link System initialized successfully');
+            
+            // Track deep link initialization
+            ga.event('Feature', 'DeepLinkInitialized', 'Success').send();
+        } else {
+            console.warn('⚠️ Deep link system could not be fully initialized');
+        }
+        
+    } catch (error) {
+        console.error('❌ Deep Link System initialization failed:', error);
+        // Still setup handlers for graceful degradation
+        setupDeepLinkIpcHandlers(null);
+        // Track deep link initialization failure
+        ga.event('Feature', 'DeepLinkInitialized', 'Failed').send();
+    }
+}
+
+// Initialize System Tray Manager
+async function initializeSystemTrayManager() {
+    console.log('🖥️ Initializing System Tray Manager...');
+    
+    try {
+        // Check if system tray is supported
+        if (!SystemTrayManager.isSupported()) {
+            console.log('[SystemTray] System tray not supported on this platform');
+            return false;
+        }
+
+        // Create and initialize system tray manager
+        systemTrayManager = new SystemTrayManager(mainWindow);
+        const initialized = await systemTrayManager.initialize();
+        
+        if (initialized) {
+            // Setup system tray IPC handlers
+            setupSystemTrayIpcHandlers();
+            
+            // Setup system tray event handlers
+            setupSystemTrayHandlers();
+            
+            // Make available globally
+            global.systemTrayManager = systemTrayManager;
+            
+            console.log('✅ System Tray Manager initialized successfully');
+            
+            // Track initialization success
+            ga.event('Feature', 'SystemTrayInitialized', 'Success').send();
+            
+            return true;
+        } else {
+            console.log('⚠️ System Tray Manager initialization skipped (disabled in settings)');
+            return false;
+        }
+
+    } catch (error) {
+        console.error('❌ Failed to initialize System Tray Manager:', error);
+        
+        // Still setup handlers for graceful degradation
+        setupSystemTrayIpcHandlers(null);
+        
+        // Track initialization failure
+        ga.event('Feature', 'SystemTrayInitialized', 'Failed').send();
+        
+        return false;
+    }
+}
+
+// Setup notification system event handlers
+function setupNotificationHandlers() {
+    if (!notificationManager) return;
+    
+    // Handle notification events
+    notificationManager.on('notification-clicked', (notificationId, options) => {
+        console.log('[NotificationHandlers] Notification clicked:', notificationId);
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('notification-clicked', { notificationId, options });
+        }
+    });
+    
+    notificationManager.on('notification-closed', (notificationId) => {
+        console.log('[NotificationHandlers] Notification closed:', notificationId);
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('notification-closed', { notificationId });
+        }
+    });
+    
+    notificationManager.on('notification-action', (notificationId, actionIndex) => {
+        console.log('[NotificationHandlers] Notification action triggered:', notificationId, actionIndex);
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('notification-action', { notificationId, actionIndex });
+        }
+    });
+    
+    notificationManager.on('notification-command', (command, data) => {
+        console.log('[NotificationHandlers] Notification command:', command, data);
+        
+        // Handle notification commands
+        handleNotificationCommand(command, data);
+    });
+    
+    notificationManager.on('settings-updated', (settings) => {
+        console.log('[NotificationHandlers] Notification settings updated');
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('notification-settings-updated', settings);
+        }
+    });
+    
+    notificationManager.on('history-updated', () => {
+        console.log('[NotificationHandlers] Notification history updated');
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('notification-history-updated');
+        }
+    });
+}
+
+// Handle notification commands
+function handleNotificationCommand(command, data) {
+    switch (command) {
+        case 'open-settings':
+            // Focus app and open settings
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.focus();
+                mainWindow.webContents.send('open-settings-tab', data.tab || 'notifications');
+            }
+            break;
+            
+        case 'open-updates':
+            // Open updates section
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.focus();
+                mainWindow.webContents.send('open-settings-tab', 'updates');
+            }
+            break;
+            
+        case 'open-security':
+            // Open security section
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.focus();
+                mainWindow.webContents.send('open-settings-tab', 'security');
+            }
+            break;
+            
+        case 'export-crash-reports':
+            // Trigger crash report export
+            if (crashReporter) {
+                crashReporter.exportReports();
+            }
+            break;
+            
+        default:
+            console.warn('[NotificationHandlers] Unknown command:', command);
+    }
+}
+
+// Setup notification IPC handlers
+function setupNotificationIpcHandlers() {
+    // Show notification
+    ipcMain.handle('notification-show', async (event, options) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const notificationId = await notificationManager.showNotification(options);
+            return { success: true, notificationId };
+        } catch (error) {
+            console.error('Error showing notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Show predefined notification types
+    ipcMain.handle('notification-show-system', async (event, title, body, options = {}) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const notificationId = await notificationManager.showSystemNotification(title, body, options);
+            return { success: true, notificationId };
+        } catch (error) {
+            console.error('Error showing system notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    ipcMain.handle('notification-show-security', async (event, title, body, options = {}) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const notificationId = await notificationManager.showSecurityAlert(title, body, options);
+            return { success: true, notificationId };
+        } catch (error) {
+            console.error('Error showing security notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    ipcMain.handle('notification-show-update', async (event, title, body, options = {}) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const notificationId = await notificationManager.showUpdateNotification(title, body, options);
+            return { success: true, notificationId };
+        } catch (error) {
+            console.error('Error showing update notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    ipcMain.handle('notification-show-chat', async (event, title, body, options = {}) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const notificationId = await notificationManager.showChatMessage(title, body, options);
+            return { success: true, notificationId };
+        } catch (error) {
+            console.error('Error showing chat notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    ipcMain.handle('notification-show-download', async (event, title, body, options = {}) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const notificationId = await notificationManager.showDownloadComplete(title, body, options);
+            return { success: true, notificationId };
+        } catch (error) {
+            console.error('Error showing download notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    ipcMain.handle('notification-show-error', async (event, title, body, options = {}) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const notificationId = await notificationManager.showError(title, body, options);
+            return { success: true, notificationId };
+        } catch (error) {
+            console.error('Error showing error notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    ipcMain.handle('notification-show-success', async (event, title, body, options = {}) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const notificationId = await notificationManager.showSuccess(title, body, options);
+            return { success: true, notificationId };
+        } catch (error) {
+            console.error('Error showing success notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Close notification
+    ipcMain.handle('notification-close', async (event, notificationId) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            notificationManager.closeNotification(notificationId);
+            return { success: true };
+        } catch (error) {
+            console.error('Error closing notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Close all notifications
+    ipcMain.handle('notification-close-all', async (event) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            notificationManager.closeAllNotifications();
+            return { success: true };
+        } catch (error) {
+            console.error('Error closing all notifications:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Get settings
+    ipcMain.handle('notification-get-settings', async (event) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const settings = notificationManager.getSettings();
+            return { success: true, settings };
+        } catch (error) {
+            console.error('Error getting notification settings:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Update settings
+    ipcMain.handle('notification-update-settings', async (event, newSettings) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            await notificationManager.updateSettings(newSettings);
+            return { success: true, settings: notificationManager.getSettings() };
+        } catch (error) {
+            console.error('Error updating notification settings:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Get history
+    ipcMain.handle('notification-get-history', async (event) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            const history = notificationManager.getHistory();
+            return { success: true, history };
+        } catch (error) {
+            console.error('Error getting notification history:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Mark as read
+    ipcMain.handle('notification-mark-read', async (event, notificationId) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            notificationManager.markAsRead(notificationId);
+            return { success: true };
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Clear history
+    ipcMain.handle('notification-clear-history', async (event) => {
+        try {
+            if (!notificationManager) {
+                return { success: false, error: 'Notification system not initialized' };
+            }
+            
+            notificationManager.clearHistory();
+            return { success: true };
+        } catch (error) {
+            console.error('Error clearing notification history:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Get system info
+    ipcMain.handle('notification-get-info', async (event) => {
+        try {
+            if (!notificationManager) {
+                return { 
+                    success: true, 
+                    info: {
+                        supported: false,
+                        enabled: false,
+                        activeCount: 0,
+                        unreadCount: 0
+                    }
+                };
+            }
+            
+            const info = {
+                supported: notificationManager.isSupported(),
+                enabled: notificationManager.isNotificationEnabled(),
+                activeCount: notificationManager.getActiveNotificationCount(),
+                unreadCount: notificationManager.getUnreadCount()
+            };
+            
+            return { success: true, info };
+        } catch (error) {
+            console.error('Error getting notification info:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    console.log('[NotificationIPC] Notification IPC handlers registered');
+}
+
+// Setup system tray event handlers
+function setupSystemTrayHandlers() {
+    if (!systemTrayManager) return;
+    
+    console.log('[SystemTrayHandlers] Setting up system tray event handlers...');
+    
+    // No specific event handlers needed for now as SystemTrayManager handles them internally
+    // This function is here for future extensibility
+    
+    console.log('[SystemTrayHandlers] System tray handlers configured');
+}
+
+// Setup deep link system event handlers
+function setupDeepLinkHandlers() {
+    if (!deepLinkManager) return;
+    
+    // Handle deep link navigation events
+    deepLinkManager.on('navigate-to-chat', (data) => {
+        console.log('[DeepLinkHandlers] Navigate to chat:', data);
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.focus();
+            mainWindow.webContents.send('navigate-to-chat', data);
+        }
+    });
+    
+    deepLinkManager.on('perform-search', (data) => {
+        console.log('[DeepLinkHandlers] Perform search:', data);
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.focus();
+            mainWindow.webContents.send('perform-search', data);
+        }
+    });
+    
+    deepLinkManager.on('navigate-to-settings', (data) => {
+        console.log('[DeepLinkHandlers] Navigate to settings:', data);
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.focus();
+            mainWindow.webContents.send('open-settings-tab', data.section || 'general');
+        }
+    });
+    
+    deepLinkManager.on('trigger-ocr', (data) => {
+        console.log('[DeepLinkHandlers] Trigger OCR:', data);
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.focus();
+            mainWindow.webContents.send('trigger-ocr', data);
+        }
+    });
+    
+    deepLinkManager.on('handle-transfer', (data) => {
+        console.log('[DeepLinkHandlers] Handle transfer:', data);
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.focus();
+            mainWindow.webContents.send('handle-transfer', data);
+        }
+    });
+    
+    deepLinkManager.on('handle-auth', (data) => {
+        console.log('[DeepLinkHandlers] Handle auth:', data);
+        
+        // Send to renderer process
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.focus();
+            mainWindow.webContents.send('handle-auth', data);
+        }
+    });
+    
+    deepLinkManager.on('link-handled', (data) => {
+        console.log('[DeepLinkHandlers] Link handled successfully:', data.url);
+    });
+    
+    deepLinkManager.on('link-rejected', (data) => {
+        console.warn('[DeepLinkHandlers] Link rejected:', data.url, data.reason);
+        
+        // Show notification about rejected link
+        if (notificationManager) {
+            notificationManager.showSecurityAlert(
+                'Deep Link Blocked',
+                `Suspicious deep link blocked: ${data.reason}`,
+                { urgency: 'normal' }
+            );
+        }
+    });
+    
+    deepLinkManager.on('link-failed', (data) => {
+        console.error('[DeepLinkHandlers] Link failed:', data.url, data.result);
+    });
+}
+
+// Setup deep link IPC handlers
+function setupDeepLinkIpcHandlers() {
+    // Handle deep link
+    ipcMain.handle('deeplink-handle', async (event, url) => {
+        try {
+            if (!deepLinkManager) {
+                return { success: false, error: 'Deep link system not initialized' };
+            }
+            
+            const result = await deepLinkManager.handleDeepLink(url);
+            return result;
+        } catch (error) {
+            console.error('Error handling deep link:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Generate deep link
+    ipcMain.handle('deeplink-generate', async (event, action, params) => {
+        try {
+            if (!deepLinkManager) {
+                return { success: false, error: 'Deep link system not initialized' };
+            }
+            
+            const url = deepLinkManager.generateDeepLink(action, params);
+            return { success: true, url };
+        } catch (error) {
+            console.error('Error generating deep link:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Get settings
+    ipcMain.handle('deeplink-get-settings', async (event) => {
+        try {
+            if (!deepLinkManager) {
+                return { success: false, error: 'Deep link system not initialized' };
+            }
+            
+            const settings = deepLinkManager.getSettings();
+            return { success: true, settings };
+        } catch (error) {
+            console.error('Error getting deep link settings:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Update settings
+    ipcMain.handle('deeplink-update-settings', async (event, newSettings) => {
+        try {
+            if (!deepLinkManager) {
+                return { success: false, error: 'Deep link system not initialized' };
+            }
+            
+            const success = await deepLinkManager.updateSettings(newSettings);
+            return { success, settings: deepLinkManager.getSettings() };
+        } catch (error) {
+            console.error('Error updating deep link settings:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Get history
+    ipcMain.handle('deeplink-get-history', async (event) => {
+        try {
+            if (!deepLinkManager) {
+                return { success: false, error: 'Deep link system not initialized' };
+            }
+            
+            const history = deepLinkManager.getHistory();
+            return { success: true, history };
+        } catch (error) {
+            console.error('Error getting deep link history:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Clear history
+    ipcMain.handle('deeplink-clear-history', async (event) => {
+        try {
+            if (!deepLinkManager) {
+                return { success: false, error: 'Deep link system not initialized' };
+            }
+            
+            deepLinkManager.clearHistory();
+            return { success: true };
+        } catch (error) {
+            console.error('Error clearing deep link history:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Get statistics
+    ipcMain.handle('deeplink-get-statistics', async (event) => {
+        try {
+            if (!deepLinkManager) {
+                return { success: false, error: 'Deep link system not initialized' };
+            }
+            
+            const statistics = deepLinkManager.getStatistics();
+            return { success: true, statistics };
+        } catch (error) {
+            console.error('Error getting deep link statistics:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Register custom route
+    ipcMain.handle('deeplink-register-route', async (event, action) => {
+        try {
+            if (!deepLinkManager) {
+                return { success: false, error: 'Deep link system not initialized' };
+            }
+            
+            // Register a route that sends data back to renderer
+            deepLinkManager.registerRoute(action, async (parsedUrl) => {
+                // Send to renderer process for handling
+                if (mainWindow && !mainWindow.isDestroyed()) {
+                    mainWindow.webContents.send('custom-deeplink-route', { action, parsedUrl });
+                }
+                
+                return {
+                    success: true,
+                    action: action,
+                    message: 'Custom route handled',
+                    data: parsedUrl
+                };
+            });
+            
+            return { success: true };
+        } catch (error) {
+            console.error('Error registering deep link route:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Add security rule
+    ipcMain.handle('deeplink-add-security-rule', async (event, pattern) => {
+        try {
+            if (!deepLinkManager) {
+                return { success: false, error: 'Deep link system not initialized' };
+            }
+            
+            deepLinkManager.addSecurityRule(pattern);
+            return { success: true };
+        } catch (error) {
+            console.error('Error adding security rule:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    console.log('[DeepLinkIPC] Deep link IPC handlers registered');
+}
+
+// Setup system tray IPC handlers
+function setupSystemTrayIpcHandlers(trayManager = systemTrayManager) {
+    // Get system tray settings
+    ipcMain.handle('system-tray-get-settings', async (event) => {
+        try {
+            if (!trayManager) {
+                return { success: false, error: 'System tray not available' };
+            }
+            
+            const settings = trayManager.getSettings();
+            return { success: true, settings };
+        } catch (error) {
+            console.error('Error getting system tray settings:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Update system tray settings
+    ipcMain.handle('system-tray-update-settings', async (event, newSettings) => {
+        try {
+            if (!trayManager) {
+                return { success: false, error: 'System tray not available' };
+            }
+            
+            trayManager.updateSettings(newSettings);
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating system tray settings:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Get system tray statistics
+    ipcMain.handle('system-tray-get-statistics', async (event) => {
+        try {
+            if (!trayManager) {
+                return { success: false, error: 'System tray not available' };
+            }
+            
+            const statistics = trayManager.getStatistics();
+            return { success: true, statistics };
+        } catch (error) {
+            console.error('Error getting system tray statistics:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Show system tray notification
+    ipcMain.handle('system-tray-show-notification', async (event, title, body, type) => {
+        try {
+            if (!trayManager) {
+                return { success: false, error: 'System tray not available' };
+            }
+            
+            trayManager.showTrayNotification(title, body, type);
+            return { success: true };
+        } catch (error) {
+            console.error('Error showing system tray notification:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Update tray tooltip
+    ipcMain.handle('system-tray-update-tooltip', async (event, tooltip) => {
+        try {
+            if (!trayManager) {
+                return { success: false, error: 'System tray not available' };
+            }
+            
+            trayManager.updateTrayTooltip(tooltip);
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating system tray tooltip:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Check if system tray is supported
+    ipcMain.handle('system-tray-is-supported', async (event) => {
+        try {
+            const supported = SystemTrayManager.isSupported();
+            return { success: true, supported };
+        } catch (error) {
+            console.error('Error checking system tray support:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    console.log('[SystemTrayIPC] System tray IPC handlers registered');
 }
 
 // Setup learning system event handlers
@@ -1535,6 +2494,151 @@ function setupPluginIpcHandlers() {
             return { success: true, path: pluginManager.pluginsDir };
         } catch (error) {
             console.error('Error getting plugins directory:', error);
+            return { success: false, error: error.message };
+        }
+    });
+}
+
+// Setup IPC handlers for crash reporting system
+function setupCrashReportingIpcHandlers(crashReportingSystem) {
+    const isDevMode = isDev;
+    
+    // Get crash reporting settings
+    ipcMain.handle('crash-reporting:get-settings', async () => {
+        try {
+            if (!crashReportingSystem) {
+                // Return default settings for development mode
+                return { 
+                    success: true, 
+                    settings: {
+                        enabled: false,
+                        privacy: {
+                            collectUserData: false,
+                            collectSystemInfo: true,
+                            collectPerformanceData: true
+                        },
+                        retentionDays: 30,
+                        performance: {
+                            memoryMonitoring: true,
+                            cpuMonitoring: true,
+                            pageLoadTimes: true,
+                            alerts: false
+                        }
+                    }
+                };
+            }
+            const settings = await crashReportingSystem.getSettings();
+            return { success: true, settings };
+        } catch (error) {
+            console.error('Error getting crash reporting settings:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Update crash reporting settings
+    ipcMain.handle('crash-reporting:update-settings', async (event, newSettings) => {
+        try {
+            if (!crashReportingSystem) {
+                // In development mode, just return success without doing anything
+                return { success: true, message: 'Settings saved (development mode)' };
+            }
+            await crashReportingSystem.updateSettings(newSettings);
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating crash reporting settings:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Get crash reports
+    ipcMain.handle('crash-reporting:get-reports', async (event, filters) => {
+        try {
+            if (!crashReportingSystem) {
+                // Return empty reports array for development mode
+                return { success: true, reports: [] };
+            }
+            const reports = await crashReportingSystem.getCrashReports(filters);
+            return { success: true, reports };
+        } catch (error) {
+            console.error('Error getting crash reports:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Get crash analytics
+    ipcMain.handle('crash-reporting:get-analytics', async (event, timeRange) => {
+        try {
+            if (!crashReportingSystem) {
+                // Return empty analytics for development mode
+                return { 
+                    success: true, 
+                    analytics: {
+                        totalCrashes: 0,
+                        recentCrashes: 0,
+                        storageSize: 0,
+                        trends: [],
+                        types: {}
+                    }
+                };
+            }
+            const analytics = await crashReportingSystem.getAnalytics(timeRange);
+            return { success: true, analytics };
+        } catch (error) {
+            console.error('Error getting crash analytics:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Test crash reporting (development only)
+    ipcMain.handle('crash-reporting:test-crash', async () => {
+        if (!isDev) {
+            return { success: false, error: 'Test crashes only available in development' };
+        }
+        
+        try {
+            if (crashReportingSystem) {
+                await crashReportingSystem.triggerTestCrash();
+            } else {
+                // Simulate test crash in development mode
+                console.log('🚨 Test crash triggered (development mode)');
+                setTimeout(() => {
+                    throw new Error('Test crash for crash reporting system verification');
+                }, 100);
+            }
+            return { success: true };
+        } catch (error) {
+            console.error('Error triggering test crash:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Clear crash reports
+    ipcMain.handle('crash-reporting:clear-reports', async () => {
+        try {
+            if (!crashReportingSystem) {
+                return { success: true, message: 'No reports to clear (development mode)' };
+            }
+            await crashReportingSystem.clearReports();
+            return { success: true };
+        } catch (error) {
+            console.error('Error clearing crash reports:', error);
+            return { success: false, error: error.message };
+        }
+    });
+    
+    // Export crash reports
+    ipcMain.handle('crash-reporting:export-reports', async (event, exportPath) => {
+        try {
+            if (!crashReportingSystem) {
+                return { 
+                    success: false, 
+                    error: 'Export not available in development mode' 
+                };
+            }
+            const exportedPath = await crashReportingSystem.exportReports(exportPath);
+            return { success: true, path: exportedPath };
+        } catch (error) {
+            console.error('Error exporting crash reports:', error);
             return { success: false, error: error.message };
         }
     });
@@ -2282,6 +3386,18 @@ ipcMain.handle('platform-get-info', async () => {
     };
 });
 
+// External Link Handler for Webviews
+ipcMain.handle('open-external-link', async (event, url) => {
+    try {
+        console.log(`Opening external link from webview: ${url}`);
+        await shell.openExternal(url);
+        return { success: true };
+    } catch (error) {
+        console.error('Failed to open external link:', error);
+        return { success: false, error: error.message };
+    }
+});
+
 // Graceful shutdown
 app.on('before-quit', async () => {
     // Shutdown cross-tab transfer system
@@ -2292,6 +3408,11 @@ app.on('before-quit', async () => {
     // Clean up chat system
     if (chatManager) {
         await chatManager.stop();
+    }
+    
+    // Clean up auto-updater
+    if (autoUpdaterManager) {
+        autoUpdaterManager.destroy();
     }
     
     if (storage) {

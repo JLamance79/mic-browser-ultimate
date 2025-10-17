@@ -22,6 +22,9 @@ class PageAnalyzer {
         // Set up performance observer
         this.setupPerformanceObserver();
         
+        // Initialize Smart Automation Analyzer
+        this.initializeSmartAutomation();
+        
         // Initialize analysis categories
         this.analysisCategories = {
             content: true,
@@ -31,8 +34,31 @@ class PageAnalyzer {
             security: true,
             social: true,
             technical: true,
-            readability: true
+            readability: true,
+            smartAutomation: true  // Added Smart Automation category
         };
+    }
+
+    /**
+     * Initialize Smart Automation system
+     */
+    initializeSmartAutomation() {
+        try {
+            // Load SmartAutomationAnalyzer if not already loaded
+            if (typeof SmartAutomationAnalyzer === 'undefined') {
+                const script = document.createElement('script');
+                script.src = './SmartAutomationAnalyzer.js';
+                script.onload = () => {
+                    this.smartAutomationAnalyzer = new SmartAutomationAnalyzer();
+                    console.log('🤖 Smart Automation Analyzer loaded');
+                };
+                document.head.appendChild(script);
+            } else {
+                this.smartAutomationAnalyzer = new SmartAutomationAnalyzer();
+            }
+        } catch (error) {
+            console.warn('Smart Automation Analyzer not available:', error.message);
+        }
     }
 
     /**
@@ -78,6 +104,11 @@ class PageAnalyzer {
             
             if (this.analysisCategories.readability) {
                 analysis.categories.readability = await this.analyzeReadability();
+            }
+
+            // Smart Automation Analysis
+            if (this.analysisCategories.smartAutomation && this.smartAutomationAnalyzer) {
+                analysis.categories.smartAutomation = await this.smartAutomationAnalyzer.analyzePageForAutomation();
             }
 
             // Generate overall score and recommendations
@@ -1513,6 +1544,139 @@ class PageAnalyzer {
         };
 
         return security;
+    }
+
+    /**
+     * Smart Automation Analysis Methods
+     */
+
+    /**
+     * Get Smart Automation analysis for current page
+     */
+    async getSmartAutomationAnalysis() {
+        if (!this.smartAutomationAnalyzer) {
+            console.warn('Smart Automation Analyzer not initialized');
+            return null;
+        }
+        
+        return await this.smartAutomationAnalyzer.analyzePageForAutomation();
+    }
+
+    /**
+     * Get automation opportunities for current page
+     */
+    async getAutomationOpportunities() {
+        if (!this.smartAutomationAnalyzer) {
+            return [];
+        }
+        
+        const analysis = await this.smartAutomationAnalyzer.analyzePageForAutomation();
+        return analysis.automationOpportunities || [];
+    }
+
+    /**
+     * Analyze DOM structure for automation
+     */
+    async analyzeDOMForAutomation() {
+        if (!this.smartAutomationAnalyzer) {
+            return null;
+        }
+        
+        return await this.smartAutomationAnalyzer.analyzeDOMStructure();
+    }
+
+    /**
+     * Detect form fields for automation
+     */
+    async detectFormFieldsForAutomation() {
+        if (!this.smartAutomationAnalyzer) {
+            return null;
+        }
+        
+        return await this.smartAutomationAnalyzer.detectFormFields();
+    }
+
+    /**
+     * Map interactive elements for automation
+     */
+    async mapInteractiveElementsForAutomation() {
+        if (!this.smartAutomationAnalyzer) {
+            return null;
+        }
+        
+        return await this.smartAutomationAnalyzer.mapInteractiveElements();
+    }
+
+    /**
+     * Get workflow suggestions for current page
+     */
+    async getWorkflowSuggestions() {
+        if (!this.smartAutomationAnalyzer) {
+            return [];
+        }
+        
+        const analysis = await this.smartAutomationAnalyzer.analyzePageForAutomation();
+        return analysis.workflows || [];
+    }
+
+    /**
+     * Generate automation report
+     */
+    async generateAutomationReport(format = 'json') {
+        if (!this.smartAutomationAnalyzer) {
+            return null;
+        }
+        
+        return this.smartAutomationAnalyzer.exportAnalysis(format);
+    }
+
+    /**
+     * Check if page is automation-ready
+     */
+    async isPageAutomationReady() {
+        if (!this.smartAutomationAnalyzer) {
+            return false;
+        }
+        
+        const analysis = await this.smartAutomationAnalyzer.analyzePageForAutomation();
+        return analysis.score >= 60; // 60+ score indicates good automation readiness
+    }
+
+    /**
+     * Get element automation score
+     */
+    getElementAutomationScore(element) {
+        if (!this.smartAutomationAnalyzer) {
+            return 0;
+        }
+        
+        return this.smartAutomationAnalyzer.calculateElementAutomationScore(element);
+    }
+
+    /**
+     * Generate optimal selector for element
+     */
+    generateOptimalSelector(element) {
+        if (!this.smartAutomationAnalyzer) {
+            // Fallback to basic selector generation
+            if (element.id) return `#${element.id}`;
+            if (element.className) return `.${element.className.split(' ')[0]}`;
+            return element.tagName.toLowerCase();
+        }
+        
+        return this.smartAutomationAnalyzer.generateOptimalSelector(element);
+    }
+
+    /**
+     * Identify automation patterns on page
+     */
+    async identifyAutomationPatterns() {
+        if (!this.smartAutomationAnalyzer) {
+            return [];
+        }
+        
+        const analysis = await this.smartAutomationAnalyzer.analyzePageForAutomation();
+        return analysis.interactiveElements?.patterns || [];
     }
 }
 

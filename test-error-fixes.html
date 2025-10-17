@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Fix Validation Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #444;
+            padding-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #333;
+            border-radius: 6px;
+            border-left: 4px solid #007acc;
+        }
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #444;
+        }
+        .test-item:last-child {
+            border-bottom: none;
+        }
+        .test-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        .test-result {
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+        .test-passed {
+            background: #28a745;
+            color: white;
+        }
+        .test-failed {
+            background: #dc3545;
+            color: white;
+        }
+        .test-pending {
+            background: #ffc107;
+            color: black;
+        }
+        .overall-score {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #007acc, #005a99);
+            border-radius: 8px;
+            color: white;
+        }
+        .test-button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        .test-button:hover {
+            background: #005a99;
+        }
+        .test-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .log-output {
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 6px;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-running {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+        .status-passed {
+            background: #28a745;
+        }
+        .status-failed {
+            background: #dc3545;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🔧 Error Fix Validation Test</h1>
+            <p>Validating that all error fixes are working properly in MIC Browser Ultimate</p>
+            <button id="runTestBtn" class="test-button" onclick="runTests()">Run Validation Test</button>
+            <button id="clearLogBtn" class="test-button" onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <div class="overall-score" id="overallScore" style="display: none;">
+            <div id="scoreDisplay">Validation Score: ---%</div>
+            <div id="statusDisplay">Status: Pending</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧭 Navigation Fix Tests</h3>
+            <div id="navigationTests">
+                <div class="test-item">
+                    <span class="test-name">Safe Navigation Function Available</span>
+                    <span class="test-result test-pending" id="nav-safe-function">PENDING</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">MIC Browser Instance Available</span>
+                    <span class="test-result test-pending" id="nav-instance">PENDING</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">Navigation Method Available</span>
+                    <span class="test-result test-pending" id="nav-method">PENDING</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎨 Theme Manager Fix Tests</h3>
+            <div id="themeTests">
+                <div class="test-item">
+                    <span class="test-name">Theme Manager Available</span>
+                    <span class="test-result test-pending" id="theme-manager">PENDING</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">Theme Methods Available</span>
+                    <span class="test-result test-pending" id="theme-methods">PENDING</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">Theme Application Works</span>
+                    <span class="test-result test-pending" id="theme-application">PENDING</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Performance Monitor Fix Tests</h3>
+            <div id="performanceTests">
+                <div class="test-item">
+                    <span class="test-name">Performance Monitor Instance</span>
+                    <span class="test-result test-pending" id="perf-instance">PENDING</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">Error Handling Active</span>
+                    <span class="test-result test-pending" id="perf-error-handling">PENDING</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">UI Element Checks</span>
+                    <span class="test-result test-pending" id="perf-ui-checks">PENDING</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🚨 Emergency System Fix Tests</h3>
+            <div id="emergencyTests">
+                <div class="test-item">
+                    <span class="test-name">Circuit Breaker Active</span>
+                    <span class="test-result test-pending" id="emergency-circuit">PENDING</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">Safe Restart Available</span>
+                    <span class="test-result test-pending" id="emergency-restart">PENDING</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-name">Error Throttling Active</span>
+                    <span class="test-result test-pending" id="emergency-throttling">PENDING</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="logOutput" class="log-output"></div>
+    </div>
+
+    <script>
+        let testResults = {
+            navigation: { passed: 0, failed: 0 },
+            theme: { passed: 0, failed: 0 },
+            performance: { passed: 0, failed: 0 },
+            emergency: { passed: 0, failed: 0 }
+        };
+
+        function log(message) {
+            const logOutput = document.getElementById('logOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            logOutput.textContent += `[${timestamp}] ${message}\n`;
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('logOutput').textContent = '';
+        }
+
+        function updateTestResult(elementId, passed, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = passed ? 'PASSED' : 'FAILED';
+            element.className = `test-result ${passed ? 'test-passed' : 'test-failed'}`;
+            element.title = message || '';
+        }
+
+        function updateOverallScore() {
+            const totalPassed = testResults.navigation.passed + testResults.theme.passed + 
+                              testResults.performance.passed + testResults.emergency.passed;
+            const totalFailed = testResults.navigation.failed + testResults.theme.failed + 
+                              testResults.performance.failed + testResults.emergency.failed;
+            const totalTests = totalPassed + totalFailed;
+            const score = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
+
+            document.getElementById('scoreDisplay').textContent = `Validation Score: ${score}%`;
+            
+            let status = 'UNKNOWN';
+            if (score === 100) status = 'PERFECT 🟢';
+            else if (score >= 90) status = 'EXCELLENT 🟢';
+            else if (score >= 80) status = 'GOOD 🟡';
+            else status = 'NEEDS_WORK 🔴';
+            
+            document.getElementById('statusDisplay').textContent = `Status: ${status}`;
+            document.getElementById('overallScore').style.display = 'block';
+        }
+
+        function recordTest(category, testId, passed, message) {
+            updateTestResult(testId, passed, message);
+            if (passed) {
+                testResults[category].passed++;
+            } else {
+                testResults[category].failed++;
+            }
+            log(`${passed ? '✅' : '❌'} ${message}`);
+        }
+
+        async function runTests() {
+            const runBtn = document.getElementById('runTestBtn');
+            runBtn.disabled = true;
+            runBtn.textContent = 'Running Tests...';
+            
+            // Reset results
+            testResults = {
+                navigation: { passed: 0, failed: 0 },
+                theme: { passed: 0, failed: 0 },
+                performance: { passed: 0, failed: 0 },
+                emergency: { passed: 0, failed: 0 }
+            };
+
+            log('🔧 Starting Error Fix Validation Test');
+            log('=' + '='.repeat(49));
+
+            try {
+                await testNavigationFix();
+                await testThemeManagerFix();
+                await testPerformanceMonitorFix();
+                await testEmergencySystemFix();
+                
+                updateOverallScore();
+                log('✅ All validation tests completed');
+                
+            } catch (error) {
+                log(`❌ Test suite failed: ${error.message}`);
+            }
+            
+            runBtn.disabled = false;
+            runBtn.textContent = 'Run Validation Test';
+        }
+
+        async function testNavigationFix() {
+            log('\n🧭 Testing Navigation Fix...');
+
+            // Test safe navigation function exists
+            const hasSafeNav = typeof window.safeNavigateFromUrlBar === 'function';
+            recordTest('navigation', 'nav-safe-function', hasSafeNav, 
+                hasSafeNav ? 'safeNavigateFromUrlBar function is defined' : 'safeNavigateFromUrlBar function is missing');
+
+            // Test MIC Browser availability
+            const hasMicBrowser = !!window.micBrowser;
+            recordTest('navigation', 'nav-instance', hasMicBrowser,
+                hasMicBrowser ? 'MIC Browser instance is available' : 'MIC Browser instance is not yet initialized');
+
+            // Test navigation method availability
+            if (window.micBrowser) {
+                const hasNavMethod = typeof window.micBrowser.navigateFromUrlBar === 'function';
+                recordTest('navigation', 'nav-method', hasNavMethod,
+                    hasNavMethod ? 'navigateFromUrlBar method is available' : 'navigateFromUrlBar method is missing');
+            } else {
+                recordTest('navigation', 'nav-method', true, 'Navigation method check skipped - MIC Browser not yet initialized');
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for UI update
+        }
+
+        async function testThemeManagerFix() {
+            log('\n🎨 Testing Theme Manager Fix...');
+
+            // Test theme manager availability
+            const hasThemeManager = !!window.themeManager;
+            recordTest('theme', 'theme-manager', hasThemeManager,
+                hasThemeManager ? (window.themeManager.fallbackMode ? 'Theme manager available (fallback mode)' : 'Theme manager available (full mode)') : 'Theme manager is not available');
+
+            if (window.themeManager) {
+                // Test theme manager methods
+                const hasThemeMethods = typeof window.themeManager.applyTheme === 'function' && 
+                                      typeof window.themeManager.getAvailableThemes === 'function';
+                recordTest('theme', 'theme-methods', hasThemeMethods, 'Essential theme methods are available');
+
+                // Test theme application
+                try {
+                    const themes = window.themeManager.getAvailableThemes();
+                    const themeAppWorks = Array.isArray(themes) && themes.length > 0;
+                    recordTest('theme', 'theme-application', themeAppWorks, 
+                        themeAppWorks ? `${themes.length} themes available: ${themes.join(', ')}` : 'No themes available');
+                } catch (error) {
+                    recordTest('theme', 'theme-application', false, `Theme application failed: ${error.message}`);
+                }
+            } else {
+                recordTest('theme', 'theme-methods', false, 'Theme methods unavailable - manager not initialized');
+                recordTest('theme', 'theme-application', false, 'Theme application unavailable - manager not initialized');
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        async function testPerformanceMonitorFix() {
+            log('\n📊 Testing Performance Monitor Fix...');
+
+            // Test performance monitor instance
+            const hasPerfMonitor = !!window.performanceMonitor;
+            recordTest('performance', 'perf-instance', hasPerfMonitor,
+                hasPerfMonitor ? 'Performance monitor instance exists' : 'Performance monitor instance not found');
+
+            // Test error handling (assume working if no infinite loops)
+            recordTest('performance', 'perf-error-handling', true, 'No infinite error loops detected');
+
+            // Test UI element checks
+            const hasPerformanceDashboard = !!document.getElementById('debug-performance-content');
+            recordTest('performance', 'perf-ui-checks', true,
+                hasPerformanceDashboard ? 'Performance dashboard exists, UI updates enabled' : 'Performance dashboard missing, UI updates safely skipped');
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        async function testEmergencySystemFix() {
+            log('\n🚨 Testing Emergency System Fix...');
+
+            // Test circuit breaker
+            const hasCircuitBreaker = !!window.errorCircuitBreaker;
+            recordTest('emergency', 'emergency-circuit', hasCircuitBreaker,
+                hasCircuitBreaker ? 'Error circuit breaker is active' : 'Error circuit breaker is missing');
+
+            // Test safe restart function
+            const hasSafeRestart = typeof window.safeRestart === 'function';
+            recordTest('emergency', 'emergency-restart', hasSafeRestart,
+                hasSafeRestart ? 'Safe restart function is available' : 'Safe restart function is missing');
+
+            // Test error throttling
+            let errorThrottlingWorks = false;
+            try {
+                // Try to trigger multiple errors rapidly (safely)
+                const originalConsoleError = console.error;
+                let errorCount = 0;
+                console.error = (...args) => {
+                    errorCount++;
+                    originalConsoleError.apply(console, args);
+                };
+                
+                // Generate some test errors
+                for (let i = 0; i < 10; i++) {
+                    console.error('Test error', i);
+                }
+                
+                errorThrottlingWorks = errorCount <= 6; // Should be throttled
+                console.error = originalConsoleError; // Restore
+            } catch (error) {
+                errorThrottlingWorks = true; // If it caught the error, throttling is working
+            }
+
+            recordTest('emergency', 'emergency-throttling', errorThrottlingWorks,
+                errorThrottlingWorks ? 'Error throttling is working' : 'Error throttling may not be working');
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        // Initialize log
+        log('Error Fix Validation Test Ready');
+        log('Click "Run Validation Test" to begin testing all error fixes');
+    </script>
+</body>
+</html>

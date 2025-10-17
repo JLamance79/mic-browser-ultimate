@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick External Link Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #007acc;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-link {
+            display: block;
+            background: #007acc;
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 15px 0;
+            transition: background 0.3s;
+            text-align: center;
+            font-weight: 500;
+        }
+        .test-link:hover {
+            background: #005a99;
+        }
+        .status {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #1a472a;
+            border-left: 4px solid #28a745;
+        }
+        .info {
+            background: #1a3a4a;
+            border-left: 4px solid #17a2b8;
+        }
+        .warning {
+            background: #4a3a1a;
+            border-left: 4px solid #ffc107;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 5px;
+            height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Quick External Link Test</h1>
+        
+        <div class="status info">
+            <h3>📋 Instructions:</h3>
+            <p>Click the links below. They should open in your default browser, NOT in this app window.</p>
+        </div>
+
+        <a href="https://www.google.com" class="test-link" target="_blank">
+            🔍 Google (with target="_blank")
+        </a>
+
+        <a href="https://github.com" class="test-link">
+            💻 GitHub (no target attribute)
+        </a>
+
+        <a href="https://stackoverflow.com" class="test-link">
+            ❓ Stack Overflow
+        </a>
+
+        <a href="https://www.microsoft.com" class="test-link" target="_blank">
+            🏢 Microsoft
+        </a>
+
+        <div class="status success" id="successMessage" style="display: none;">
+            <h3>✅ Success!</h3>
+            <p>External links are working correctly. They should have opened in your default browser.</p>
+        </div>
+
+        <div class="status warning" id="warningMessage" style="display: none;">
+            <h3>⚠️ Warning!</h3>
+            <p>If links opened in this window instead of your browser, the external link handling needs fixing.</p>
+        </div>
+
+        <h3>📊 Console Log:</h3>
+        <div id="logOutput" class="log"></div>
+
+        <div class="status info">
+            <h3>🔧 Expected Behavior:</h3>
+            <ul>
+                <li>✅ Links should open in your default browser (Chrome, Firefox, Edge, etc.)</li>
+                <li>✅ This window should remain unchanged</li>
+                <li>✅ Console should show "Opening external link" messages</li>
+                <li>❌ Links should NOT navigate this window to external sites</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let logOutput = document.getElementById('logOutput');
+        let linkClickCount = 0;
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logOutput.textContent += `[${timestamp}] ${message}\n`;
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        // Override console.log to capture messages
+        const originalConsoleLog = console.log;
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            log(args.join(' '));
+        };
+
+        // Override console.warn to capture warnings
+        const originalConsoleWarn = console.warn;
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            log('⚠️ ' + args.join(' '));
+        };
+
+        // Track link clicks
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' && e.target.href) {
+                linkClickCount++;
+                log(`🔗 Link clicked: ${e.target.href}`);
+                
+                // Show status after first click
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('warningMessage').style.display = 'block';
+                }, 500);
+            }
+        });
+
+        // Check if electronAPI is available
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 External Link Test Loaded');
+            
+            if (window.electronAPI && window.electronAPI.openExternalLink) {
+                log('✅ electronAPI.openExternalLink is available');
+            } else {
+                log('❌ electronAPI.openExternalLink not available');
+            }
+            
+            log('💡 Click any link above to test external link handling');
+        });
+    </script>
+</body>
+</html>
